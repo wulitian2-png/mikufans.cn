@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 John Resig (jquery.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
- * and GPL (GPL-LICENSE.txt) licenses.
+ * and GPL (GPL-LICENSE.txt) licenses.  // 这个文件改完了
  *
  * $Date: 2008/12/09 01:54:08 $
  * $Rev: 5685 $
