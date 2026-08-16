@@ -1,0 +1,10 @@
+<PAD>
+  <!-- 弹幕滚动参数 -->
+  <scroll constv="false" delay="4000"/>
+  <!-- 弹幕淡出参数 -->
+  <fade delay="3500" alphaTo="1"/>
+  <!-- 弹幕池容量 -->
+  <pool capacity="999999999999"/>
+  <!-- 关键词黑名单（空的） -->
+  <keywords> </keywords>
+</PAD>

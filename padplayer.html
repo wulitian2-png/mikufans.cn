@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>PADplayer HTML5</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #e5e5e5;
+  font-family: "Microsoft YaHei", "SimHei", "宋体", Arial, sans-serif;
+  font-size: 12px;
+  color: #333;
+  overflow: hidden;
+}
+#app {
+  width: 950px;
+  height: 482px;
+  position: relative;
+  margin: 20px auto;
+  background: #fff;
+  border: 1px solid #ccc;
+}
+
+/* 视频区 */
+#video-box {
+  position: absolute;
+  left: 0; top: 0;
+  width: 542px; height: 386px;
+  background: #000;
+  overflow: hidden;
+}
+#video-inner {
+  width: 100%; height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+video {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  object-fit: contain;
+}
+#danmaku-layer {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 5;
+}
+#ply {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 50px;
+  color: rgba(255,255,255,0.8);
+  cursor: pointer;
+  display: none;
+  z-index: 6;
+  text-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+#spwh {
+  position: absolute;
+  left: 4px; top: 4px;
+  display: none;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid #999;
+  border-radius: 2px;
+  z-index: 20;
+}
+#video-box:hover #spwh { display: block; }
+#spwh button {
+  display: block; width: 60px; height: 22px;
+  border: none; background: transparent;
+  cursor: pointer; font-size: 12px;
+}
+#spwh button:hover { background: #ddd; }
+
+/* 控制条 */
+#controls {
+  position: absolute;
+  left: 0; top: 386px;
+  width: 542px; height: 28px;
+  background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+  border-top: 1px solid #bbb;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  gap: 4px;
+}
+#controls button {
+  width: 24px; height: 24px;
+  border: 1px solid #999;
+  background: #e8e8e8;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 22px;
+  text-align: center;
+  border-radius: 2px;
+}
+#controls button:hover { background: #d8d8d8; }
+#controls button:disabled { opacity: 0.5; cursor: not-allowed; }
+#ps {
+  flex: 1;
+  height: 14px;
+  cursor: pointer;
+}
+#vs { width: 70px; cursor: pointer; }
+#tl {
+  width: 70px;
+  text-align: center;
+  font-family: Verdana;
+  font-size: 9px;
+  color: #000;
+}
+
+/* 发送区 */
+#sender {
+  position: absolute;
+  left: 0; top: 415px;
+  width: 542px; height: 28px;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  gap: 6px;
+}
+#msds {
+  width: 76px; height: 30px;
+  border: 1px solid #999;
+  background: #e8e8e8;
+  cursor: pointer;
+  font-size: 12px;
+}
+#cpk {
+  width: 28px; height: 24px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  padding: 0;
+  background: none;
+}
+#fsc {
+  width: 78px; height: 24px;
+  font-size: 12px;
+}
+#cti {
+  flex: 1;
+  height: 24px;
+  border: 1px solid #888;
+  padding: 0 4px;
+  font-size: 12px;
+}
+#csb {
+  width: 79px; height: 24px;
+  border: 1px solid #999;
+  background: linear-gradient(to bottom, #fff, #d0d0ff);
+  cursor: pointer;
+  font-size: 12px;
+  border-radius: 2px;
+}
+#csb:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  color: #666;
+}
+
+/* 右侧面板 */
+#right-panel {
+  position: absolute;
+  left: 543px; top: 0;
+  width: 407px; height: 442px;
+  background: #fff;
+  border-left: 1px solid #999;
+  display: flex;
+  flex-direction: column;
+}
+.tab-header {
+  display: flex;
+  background: #e0e0e0;
+  border-bottom: 1px solid #999;
+}
+.tab-btn {
+  flex: 1;
+  height: 24px;
+  border: none;
+  background: #d8d8d8;
+  cursor: pointer;
+  font-size: 12px;
+  border-right: 1px solid #bbb;
+}
+.tab-btn.active {
+  background: #fff;
+  font-weight: bold;
+  border-bottom: 1px solid #fff;
+  margin-bottom: -1px;
+}
+.tab-body {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+.tab-content {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  display: none;
+  overflow: auto;
+  padding: 4px;
+}
+.tab-content.active { display: block; }
+
+/* 评论列表表格 */
+#cdg {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  table-layout: fixed;
+}
+#cdg th {
+  background: #f0f0f0;
+  border-bottom: 1px solid #ccc;
+  padding: 4px;
+  text-align: left;
+}
+#cdg td {
+  padding: 4px;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#cdg tbody tr:nth-child(even) { background: #f9f9f9; }
+#cdg tbody tr:hover { background: #e8f0ff; cursor: pointer; }
+#cdg tbody tr.selected { background: #cce0ff; }
+
+/* 过滤面板 */
+.filter-row {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.filter-row label { margin-right: 4px; }
+.filter-btn {
+  padding: 2px 8px;
+  border: 1px solid #999;
+  background: #f5f5f5;
+  cursor: pointer;
+  font-size: 12px;
+  margin-right: 2px;
+}
+.filter-btn.active {
+  background: #d0e0ff;
+  border-color: #6699cc;
+}
+#filterkwlist {
+  width: 100%; height: 260px;
+  border: 1px solid #ccc;
+  overflow-y: auto;
+  background: #fff;
+  margin: 4px 0;
+}
+#filterkwlist div {
+  padding: 2px 4px;
+  border-bottom: 1px solid #eee;
+  cursor: default;
+}
+#filterkwlist div:nth-child(even) { background: #f9f9f9; }
+#filterkwlist div.selected { background: #cce0ff; }
+
+/* 底部状态栏 */
+#bottom-bar {
+  position: absolute;
+  left: 0; top: 441px;
+  width: 950px; height: 41px;
+  background: #f5f5f5;
+  border-top: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  justify-content: space-between;
+}
+#dmcont {
+  width: 80px; height: 20px;
+  border: 1px solid #ccc;
+  background: #6d6d6d;
+  color: #fff;
+  text-align: center;
+  font-size: 12px;
+}
+#txtsktinfo {
+  color: #666;
+  margin-left: 535px;
+}
+
+/* 弹窗通用 */
+.popup {
+  position: absolute;
+  background: rgba(255,255,255,0.95);
+  border: 2px outset #ccc;
+  border-radius: 4px;
+  padding: 8px;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+  z-index: 100;
+}
+.popup-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.popup-close {
+  width: 16px; height: 16px;
+  cursor: pointer;
+  text-align: center;
+  line-height: 16px;
+  font-weight: bold;
+  color: #666;
+}
+.popup-close:hover { color: #000; }
+
+/* 模式选择弹窗 */
+#titleq {
+  left: 1px; top: 301px;
+  width: 270px;
+}
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin-top: 4px;
+}
+.mode-grid button {
+  height: 50px;
+  border: 1px solid #999;
+  background: #f0f0f0;
+  cursor: pointer;
+  font-size: 12px;
+}
+.mode-grid button:hover { background: #e0e0e0; }
+.pool-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  align-items: center;
+}
+
+/* 设置弹窗 */
+#systemconfig {
+  left: 744px; top: 25px;
+  width: 204px;
+}
+.config-row { margin-bottom: 8px; }
+.config-row label { display: block; margin-bottom: 2px; }
+
+/* 全屏调整 */
+#app.fullscreen {
+  width: 100vw; height: 100vh;
+  margin: 0;
+  border: none;
+}
+#app.fullscreen #video-box {
+  width: 100%; height: 100%;
+  left: 0; top: 0;
+}
+#app.fullscreen #right-panel,
+#app.fullscreen #sender,
+#app.fullscreen #bottom-bar,
+#app.fullscreen #spwh { display: none; }
+#app.fullscreen #controls {
+  left: auto; right: 10px; bottom: 10px; top: auto;
+  width: 542px;
+  position: fixed;
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+#app.fullscreen:hover #controls { opacity: 1; }
+
+/* 弹幕样式 */
+.danmaku-item {
+  position: absolute;
+  white-space: nowrap;
+  font-weight: bold;
+  font-family: "Microsoft YaHei", "SimHei", "黑体", "幼圆", "宋体", Arial;
+  pointer-events: none;
+  user-select: none;
+  line-height: 1.2;
+  z-index: 10;
+}
+</style>
+<base target="_blank">
+<base target="_blank">
+</head>
+<body>
+<div id="app">
+  <div id="video-box">
+    <div id="video-inner">
+      <video id="video" preload="metadata" playsinline></video>
+    </div>
+    <div id="danmaku-layer"></div>
+    <div id="ply">▶</div>
+    <div id="spwh">
+      <button data-wh="default">默认</button>
+      <button data-wh="43">4:3</button>
+      <button data-wh="169">16:9</button>
+    </div>
+  </div>
+
+  <div id="controls">
+    <button id="pb" title="播放/暂停">▶</button>
+    <input type="range" id="ps" min="0" max="100" value="0" step="0.1" title="时空跃迁">
+    <span id="tl">0:00/0:00</span>
+    <button id="mucor" title="禁音开关">🔊</button>
+    <input type="range" id="vs" min="0" max="1" step="0.01" value="0.7" title="音量">
+    <button id="cob" title="隐藏评论">💬</button>
+    <button id="xunhuanb" title="洗脑循环 off">🔁</button>
+    <button id="fsbtn" title="全屏播放">⛶</button>
+  </div>
+
+  <div id="sender">
+    <button id="msds" title="弹幕模式选择">弹幕模式</button>
+    <input type="color" id="cpk" value="#ffffff" title="弹幕颜色">
+    <select id="fsc" title="弹幕大小">
+      <option value="12">非常小</option>
+      <option value="16">特小</option>
+      <option value="18">小</option>
+      <option value="25" selected>中</option>
+      <option value="36">大</option>
+      <option value="45">很大</option>
+    </select>
+    <input type="text" id="cti" placeholder="回车发送" title="回车发送." maxlength="220">
+    <button id="csb" disabled title="毁灭的喷射白光!da!">发送评论</button>
+  </div>
+
+  <div id="right-panel">
+    <div class="tab-header">
+      <button class="tab-btn active" data-tab="comments">评论列表</button>
+      <button class="tab-btn" data-tab="filter">屏蔽和过滤</button>
+    </div>
+    <div class="tab-body">
+      <div id="tab-comments" class="tab-content active">
+        <table id="cdg">
+          <thead><tr><th style="width:50px">时间</th><th>内容</th><th style="width:130px">发送日期</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="tab-filter" class="tab-content">
+        <div class="filter-row">
+          <label>允许模式:</label>
+          <button class="filter-btn active" id="_mode1" data-mode="1">滚动弹幕</button>
+          <button class="filter-btn active" id="_mode5" data-mode="5">顶部弹幕</button>
+          <button class="filter-btn active" id="_mode4" data-mode="4">底部弹幕</button>
+          <button class="filter-btn active" id="_mode6" data-mode="6">逆向弹幕</button>
+        </div>
+        <div class="filter-row">
+          <label>允许弹幕池:</label>
+          <label><input type="checkbox" id="vspool0" checked> 普通弹幕</label>
+          <label><input type="checkbox" id="vspool1" checked> 字幕弹幕</label>
+          <label><input type="checkbox" id="vspool2" checked> 特殊弹幕</label>
+        </div>
+        <div style="margin-top:8px;">
+          <input type="text" id="kwinput" placeholder="写死你丫的" style="width:200px; height:22px;">
+          <button id="addkwb" style="height:22px; padding:0 8px;">添加</button>
+          <button id="delkwb" style="height:22px; padding:0 8px;">删除</button>
+        </div>
+        <div id="filterkwlist"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="bottom-bar">
+    <span id="txtsktinfo">本地弹幕模式 - 初始化中</span>
+    <input type="text" id="dmcont" readonly value="弹幕 0 条">
+  </div>
+
+  <!-- 弹窗：弹幕模式 -->
+  <div id="titleq" class="popup" style="display:none;">
+    <div class="popup-title">
+      <span>弹幕模式选择</span>
+      <span class="popup-close" id="btutcq">×</span>
+    </div>
+    <div class="pool-row">
+      <label><input type="radio" name="pool" value="0" checked> 普通</label>
+      <label><input type="radio" name="pool" value="1"> 字幕</label>
+      <label><input type="radio" name="pool" value="2"> 特殊</label>
+    </div>
+    <div class="mode-grid">
+      <button id="dm1" title="顶部固定">顶部</button>
+      <button id="dm2" title="滚动弹幕">滚动</button>
+      <button id="dm4" title="底部固定">底部</button>
+      <button id="dm3" title="逆向滚动">逆向</button>
+    </div>
+  </div>
+
+  <!-- 弹窗：设置 -->
+  <div id="systemconfig" class="popup" style="display:none;">
+    <div class="popup-title">
+      <span>弹幕显示详细设置</span>
+      <span class="popup-close" id="btutcx">×</span>
+    </div>
+    <div class="config-row">
+      <label>滚动弹幕透明度</label>
+      <input type="range" id="vapl" min="0.2" max="1" step="0.01" value="1" style="width:180px;">
+    </div>
+    <div class="config-row">
+      <label><input type="checkbox" id="part"> 自动换P</label>
+    </div>
+    <div class="config-row">
+      <label>弹幕描边:</label>
+      <label><input type="radio" name="dmMB" value="0" checked> 重墨</label>
+      <label><input type="radio" name="dmMB" value="1"> 描边</label>
+      <label><input type="radio" name="dmMB" value="2"> 45℃投影</label>
+    </div>
+  </div>
+
+  <!-- 设置按钮 -->
+  <button id="cofgs" style="position:absolute; left:770px; top:3px; width:16px; height:16px; cursor:pointer; z-index:50; border:none; background:none; font-size:14px;" title="弹幕相关设置">⚙</button>
+</div>
+
+<script>
+// ===================== 全局状态 =====================
+window.CommentCommapl = 1;
+window.CommentCommaMB = 0;
+
+// ===================== 工具类 =====================
+class CommentData {
+  constructor(mode, time, color, size, txt, date, pool, isSelf) {
+    this.mode = mode;
+    this.time = time;
+    this.color = color;
+    this.size = size;
+    this.txt = txt;
+    this.date = date;
+    this.pool = pool;
+    this.isSelf = isSelf || false;
+    this._displayed = false;
+    this._id = Math.random().toString(36).substr(2, 9);
+  }
+}
+
+class ModeFilter {
+  constructor(modes) { this.modes = modes || []; }
+  addMode(m) { const n = parseInt(m); if (!this.modes.includes(n)) this.modes.push(n); }
+  removeMode(m) { const n = parseInt(m); this.modes = this.modes.filter(x => x !== n); }
+  removeALL() { this.modes = []; }
+  filter(items) { return items.some(item => this.modes.includes(item.mode)); }
+}
+
+class KWFilter {
+  constructor(keywords) { this.keywords = keywords || []; }
+  filter(items) { return items.some(item => this.keywords.some(k => item.txt.includes(k))); }
+}
+
+class FilterChain {
+  constructor() { this.filters = []; }
+  addFilter(f) { this.filters.push(f); }
+  filter(items) { return this.filters.some(f => f.filter(items)); }
+}
+
+// ===================== 弹幕管理器 =====================
+class CommentManager {
+  constructor(container, config) {
+    this.container = container;
+    this.poolsize = config.poolsize || 80;
+    this.fduration = config.fduration || 4000;
+    this.constv = config.constv !== false;
+    this.velocity = config.velocity || 4000;
+    this.sduration = config.sduration || 3500;
+    this.alphaTo = config.alphaTo || 1;
+    this.filterChain = config.filterChain;
+    this.comments = [];
+    this.paused = false;
+    this.lastTime = 0;
+    this.trackHeight = 28;
+    this.rollingTracks = [];
+  }
+
+  init(data) {
+    this.comments = data.sort((a, b) => a.time - b.time);
+    this.clearAll();
+  }
+
+  displayComments(t) {
+    if (this.paused) return;
+    this.comments.forEach(c => {
+      if (c.time >= this.lastTime && c.time <= t && !c._displayed) {
+        if (CommentManager.nopool.includes(c.pool)) return;
+        if (this.filterChain && this.filterChain.filter([c])) return;
+        this.show(c);
+        c._displayed = true;
+      }
+    });
+    this.lastTime = t;
+  }
+
+  show(data) {
+    const el = document.createElement('div');
+    el.className = 'danmaku-item';
+    el.textContent = data.txt;
+    const hex = (data.color).toString(16).padStart(6, '0');
+    el.style.color = '#' + hex;
+    el.style.fontSize = data.size + 'px';
+    el.style.opacity = window.CommentCommapl || 1;
+
+    const mb = parseInt(window.CommentCommaMB || 0);
+    if (mb === 0) el.style.textShadow = '1px 1px 2px #000, -1px -1px 2px #000, 1px -1px 2px #000, -1px 1px 2px #000';
+    else if (mb === 1) el.style.textShadow = '1px 1px 1px #000';
+    else if (mb === 2) el.style.textShadow = '2px 2px 2px rgba(0,0,0,0.5)';
+
+    const w = this.container.clientWidth;
+    const h = this.container.clientHeight;
+
+    if (data.mode === 1) { // 滚动
+      const tracks = Math.max(1, Math.floor(h / this.trackHeight));
+      let track = 0;
+      for (let i = 0; i < tracks; i++) {
+        if (!this.rollingTracks[i] || this.rollingTracks[i] < Date.now()) {
+          track = i;
+          this.rollingTracks[i] = Date.now() + this.velocity;
+          break;
+        }
+        if (i === tracks - 1) {
+          track = Math.floor(Math.random() * tracks);
+          this.rollingTracks[track] = Date.now() + this.velocity;
+        }
+      }
+      el.style.top = (track * this.trackHeight) + 'px';
+      el.style.left = w + 'px';
+      this.container.appendChild(el);
+      const elW = el.offsetWidth;
+      el.style.transition = `transform ${this.velocity}ms linear`;
+      requestAnimationFrame(() => {
+        el.style.transform = `translateX(-${w + elW + 20}px)`;
+      });
+      setTimeout(() => { if(el.parentNode) el.remove(); }, this.velocity + 200);
+    } else if (data.mode === 5) { // 顶部
+      el.style.top = '10px';
+      el.style.left = '50%';
+      el.style.transform = 'translateX(-50%)';
+      this.container.appendChild(el);
+      setTimeout(() => { if(el.parentNode) el.remove(); }, this.sduration);
+    } else if (data.mode === 4) { // 底部
+      el.style.bottom = '10px';
+      el.style.left = '50%';
+      el.style.transform = 'translateX(-50%)';
+      this.container.appendChild(el);
+      setTimeout(() => { if(el.parentNode) el.remove(); }, this.sduration);
+    } else if (data.mode === 6) { // 逆向
+      const tracks = Math.max(1, Math.floor(h / this.trackHeight));
+      let track = 0;
+      for (let i = 0; i < tracks; i++) {
+        if (!this.rollingTracks[i] || this.rollingTracks[i] < Date.now()) {
+          track = i;
+          this.rollingTracks[i] = Date.now() + this.velocity;
+          break;
+        }
+        if (i === tracks - 1) {
+          track = Math.floor(Math.random() * tracks);
+          this.rollingTracks[track] = Date.now() + this.velocity;
+        }
+      }
+      el.style.top = (track * this.trackHeight) + 'px';
+      el.style.left = '-300px';
+      this.container.appendChild(el);
+      const elW = el.offsetWidth;
+      el.style.transition = `transform ${this.velocity}ms linear`;
+      requestAnimationFrame(() => {
+        el.style.transform = `translateX(${w + elW + 20}px)`;
+      });
+      setTimeout(() => { if(el.parentNode) el.remove(); }, this.velocity + 200);
+    }
+  }
+
+  clearAll() {
+    this.container.innerHTML = '';
+    this.comments.forEach(c => c._displayed = false);
+    this.lastTime = 0;
+    this.rollingTracks = [];
+  }
+
+  resetTime(t) {
+    this.lastTime = t;
+    this.comments.forEach(c => { c._displayed = c.time < t; });
+    this.container.innerHTML = '';
+  }
+  Timereset(t) { this.resetTime(t); }
+  pause() { this.paused = true; }
+  resume() { this.paused = false; }
+
+  addComment(cd) {
+    this.comments.push(cd);
+    cd._displayed = false;
+    this.show(cd);
+  }
+
+  Dmlength() { return this.comments.length; }
+  setsduration(v) { this.sduration = v; }
+}
+CommentManager.nopool = [];
+
+// ===================== 主应用 =====================
+class PADPlayer {
+  constructor() {
+    this.avId = '';
+    this.mode = 0;
+    this.localDanmaku = [];
+    this.anyLoaded = false;
+    this.xunhuan = false;
+    this.tot = '0:00';
+    this.rggurl = '';
+    this.config = null;
+    this.cm = null;
+    this.mf = new ModeFilter();
+    this.kf = new KWFilter();
+    this.sfc = new FilterChain();
+    this.mdcValue = 1;
+    this._seeking = false;
+    this.currentVideoPath = '';
+
+    this.els = {};
+    this.initElements();
+    this.bindEvents();
+    this.loadConfig();
+  }
+
+  initElements() {
+    const ids = ['video','video-inner','danmaku-layer','pb','ps','tl','mucor','vs','cob','xunhuanb','fsbtn',
+      'msds','cpk','fsc','cti','csb','cdg','filterkwlist','addkwb','delkwb','kwinput',
+      '_mode1','_mode4','_mode5','_mode6','vspool0','vspool1','vspool2',
+      'titleq','btutcq','dm1','dm2','dm3','dm4','systemconfig','btutcx','vapl','part',
+      'cofgs','txtsktinfo','dmcont','ply'];
+    ids.forEach(id => this.els[id] = document.getElementById(id));
+    this.els.cdgBody = this.els.cdg.querySelector('tbody');
+  }
+
+  bindEvents() {
+    const v = this.els.video;
+    v.addEventListener('click', () => this.onPlay());
+    v.addEventListener('loadedmetadata', () => this.onMetaLoad());
+    v.addEventListener('progress', () => this.onProgress());
+    v.addEventListener('error', () => this.onVError());
+    v.addEventListener('ended', () => this.onEnded());
+
+    this.els.pb.addEventListener('click', () => this.onPlay());
+    this.els.ply.addEventListener('click', () => this.onPlay());
+
+    this.els.ps.addEventListener('input', (e) => {
+      const v = this.els.video;
+      if (v.readyState < 1) return;
+      if (this._seeking) {
+        const val = parseFloat(e.target.value);
+        this.els.tl.textContent = this.formatTime(val) + '/' + this.tot;
+        return;
+      }
+      v.currentTime = parseFloat(e.target.value);
+      this.cm.resetTime(v.currentTime);
+      this.els.ply.style.display = 'none';
+      this.els.pb.textContent = '⏸';
+    });
+    this.els.ps.addEventListener('mousedown', () => { this._seeking = true; this.cm.pause(); this.els.video.pause(); this.els.pb.textContent = '▶'; });
+    this.els.ps.addEventListener('mouseup', () => {
+      this._seeking = false;
+      const v = this.els.video;
+      v.currentTime = parseFloat(this.els.ps.value);
+      this.cm.resetTime(v.currentTime);
+      v.play().catch(() => {});
+      this.cm.resume();
+      this.els.pb.textContent = '⏸';
+      this.els.ply.style.display = 'none';
+    });
+
+    this.els.vs.addEventListener('input', (e) => this.soundAdjust(e));
+    this.els.mucor.addEventListener('click', () => this.muix());
+
+    this.els.cob.addEventListener('click', () => this.ycpl());
+    this.els.xunhuanb.addEventListener('click', () => this.xunhuani());
+    this.els.fsbtn.addEventListener('click', () => this.onFS());
+
+    this.els.csb.addEventListener('click', () => this.onSend());
+    this.els.cti.addEventListener('keydown', (e) => this.btnOK_Enter(e));
+    this.els.msds.addEventListener('click', () => { this.els.titleq.style.display = 'block'; });
+
+    this.els.btutcq.addEventListener('click', () => { this.els.titleq.style.display = 'none'; });
+    this.els.btutcx.addEventListener('click', () => { this.els.systemconfig.style.display = 'none'; });
+    this.els.cofgs.addEventListener('click', () => { this.els.systemconfig.style.display = 'block'; });
+
+    // 模式选择
+    this.els.dm1.addEventListener('click', () => { this.mdcValue = 5; this.els.titleq.style.display = 'none'; });
+    this.els.dm2.addEventListener('click', () => { this.mdcValue = 1; this.els.titleq.style.display = 'none'; });
+    this.els.dm3.addEventListener('click', () => { this.mdcValue = 6; this.els.titleq.style.display = 'none'; });
+    this.els.dm4.addEventListener('click', () => { this.mdcValue = 4; this.els.titleq.style.display = 'none'; });
+
+    // Tab 切换
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    // 过滤模式按钮
+    ['_mode1','_mode4','_mode5','_mode6'].forEach(id => {
+      const btn = this.els[id];
+      btn.addEventListener('click', () => {
+        btn.classList.toggle('active');
+        this.onFMode();
+      });
+    });
+
+    // 弹幕池过滤
+    ['vspool0','vspool1','vspool2'].forEach(id => {
+      this.els[id].addEventListener('click', () => this.onpool());
+    });
+
+    // 关键词过滤
+    this.els.addkwb.addEventListener('click', () => this.onAddKWB());
+    this.els.delkwb.addEventListener('click', () => this.onDelKWB());
+    this.els.kwinput.addEventListener('keydown', (e) => { if(e.key==='Enter') this.onAddKWB(); });
+
+    // 设置
+    this.els.vapl.addEventListener('input', (e) => { window.CommentCommapl = parseFloat(e.target.value); });
+    document.querySelectorAll('input[name="dmMB"]').forEach(r => {
+      r.addEventListener('change', () => { window.CommentCommaMB = parseInt(r.value); });
+    });
+
+    // 全屏监听
+    document.addEventListener('fullscreenchange', () => this.fullScreenHandler());
+
+    // 弹幕列表点击跳转
+    this.els.cdgBody.addEventListener('click', (e) => {
+      const tr = e.target.closest('tr');
+      if (!tr) return;
+      this.els.cdgBody.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
+      tr.classList.add('selected');
+    });
+    this.els.cdgBody.addEventListener('dblclick', (e) => {
+      const tr = e.target.closest('tr');
+      if (!tr || !tr._data) return;
+      const t = Math.max(0, tr._data.time - 1);
+      this.els.video.currentTime = t;
+      this.cm.resetTime(t);
+    });
+
+    // 视频比例
+    document.querySelectorAll('#spwh button').forEach(b => {
+      b.addEventListener('click', () => this.WHbh(b.dataset.wh));
+    });
+
+    // 循环渲染
+    requestAnimationFrame(() => this.loop());
+  }
+
+  loop() {
+    const v = this.els.video;
+    if (v.readyState >= 1 && v.duration) {
+      this.els.ps.max = v.duration;
+      if (!this._seeking) this.els.ps.value = v.currentTime;
+      this.tot = this.formatTime(v.duration);
+      this.els.tl.textContent = this.formatTime(v.currentTime) + '/' + this.tot;
+      if (!v.paused) {
+        this.cm.displayComments(v.currentTime);
+      }
+    }
+    requestAnimationFrame(() => this.loop());
+  }
+
+  loadConfig() {
+    fetch('./pad.xml')
+      .then(r => r.text())
+      .then(xmlText => {
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(xmlText, 'text/xml');
+        const config = this.getDefaultConfig();
+        const scroll = xml.querySelector('scroll');
+        if (scroll) {
+          config.constv = scroll.getAttribute('constv') !== 'false';
+          config.velocity = parseInt(scroll.getAttribute('delay')) || 4000;
+        }
+        const fade = xml.querySelector('fade');
+        if (fade) {
+          config.sduration = parseInt(fade.getAttribute('delay')) || 3500;
+          config.alphaTo = parseFloat(fade.getAttribute('alphaTo')) || 1;
+        }
+        const pool = xml.querySelector('pool');
+        if (pool) config.poolsize = parseInt(pool.getAttribute('capacity')) || 80;
+        const rgg = xml.querySelector('rgg');
+        if (rgg) {
+          config.rggimg = rgg.getAttribute('img') || '';
+          config.rggsrc = rgg.getAttribute('url') || '';
+          config.rggtitle = rgg.getAttribute('title') || 'no';
+        }
+        const kw = xml.querySelector('keywords');
+        if (kw) {
+          const txt = kw.textContent || '';
+          config.keywords = txt.split(/[,，]/).map(s => s.trim()).filter(Boolean);
+        }
+        this.onConfigLoaded(config);
+      })
+      .catch(() => this.onConfigLoaded(this.getDefaultConfig()));
+  }
+
+  getDefaultConfig() {
+    return {
+      constv: true, velocity: 4000, sduration: 3500, alphaTo: 1,
+      poolsize: 80, fduration: 4000, rggimg: '', rggsrc: '', rggtitle: 'no',
+      keywords: [], getPattern: '', sendPattern: ''
+    };
+  }
+
+  onConfigLoaded(config) {
+    this.config = config;
+    this.kf = new KWFilter(config.keywords);
+    this.sfc = new FilterChain();
+    this.sfc.addFilter(this.kf);
+
+    const fc = new FilterChain();
+    fc.addFilter(this.mf);
+    fc.addFilter(this.kf);
+
+    this.cm = new CommentManager(this.els['danmaku-layer'], {
+      poolsize: config.poolsize,
+      fduration: config.fduration,
+      constv: config.constv,
+      velocity: config.velocity,
+      sduration: config.sduration,
+      alphaTo: config.alphaTo,
+      filterChain: fc
+    });
+
+    config.keywords.forEach(k => this.addKWItem(k));
+
+    const p = new URLSearchParams(location.search);
+    const file = p.get('file');
+    const id = p.get('id');
+    const vid = p.get('vid') || p.get('avid') || p.get('qid') || p.get('ykid') || p.get('uid');
+
+    if (file && id) {
+      this.loadLocalVideo(file, id);
+    } else if (vid) {
+      this.loadLocalVideo('av' + vid + '.mp4', vid);
+    } else {
+      this.loadLocalVideo('av1.mp4', '1');
+    }
+
+    this.initLocalUser();
+  }
+
+  initLocalUser() {
+    this.els.txtsktinfo.textContent = '本地弹幕模式 - 已就绪';
+    this.els.cti.maxLength = 220;
+    this.els.dmcont.value = '弹幕 0 条';
+  }
+
+  loadLocalVideo(file, id) {
+    this.avId = id;
+    this.mode = 'FILE';
+    const videoPath = './video/' + file;
+    this.currentVideoPath = videoPath;
+
+    console.log('[PADPlayer] 加载视频:', videoPath);
+    this.els.txtsktinfo.textContent = '加载视频: ' + file;
+
+    this.els.video.src = videoPath;
+    this.els.video.load();
+
+    this.loadLocalDanmaku(id);
+    this.disableAll();
+  }
+
+  loadLocalDanmaku(id) {
+    const path = './danmaku/av' + id + '.xml';
+    console.log('[PADPlayer] 请求弹幕:', path);
+    this.els.txtsktinfo.textContent += ' | 弹幕: av' + id + '.xml';
+
+    fetch(path)
+      .then(r => {
+        if (!r.ok) {
+          console.error('[PADPlayer] 弹幕 HTTP 错误:', r.status, path);
+          throw new Error('HTTP ' + r.status);
+        }
+        return r.text();
+      })
+      .then(xmlText => {
+        console.log('[PADPlayer] 弹幕 XML 长度:', xmlText.length);
+        const list = this.parseLocalDanmaku(xmlText);
+        console.log('[PADPlayer] 解析到弹幕数:', list.length);
+        this.onLocalDanmakuLoaded(list);
+      })
+      .catch(err => {
+        console.error('[PADPlayer] 弹幕加载失败:', err);
+        this.onLocalDanmakuLoaded([]);
+      });
+  }
+
+  // ===================== 修复：解析 + 去重 =====================
+  parseLocalDanmaku(xmlText) {
+    const result = [];
+    const seen = new Set(); // 去重：防止 XML 里出现重复条目
+    try {
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(xmlText, 'text/xml');
+      const items = xml.querySelectorAll('d');
+      console.log('[PADPlayer] XML 中 <d> 标签数:', items.length);
+
+      items.forEach((item, idx) => {
+        const p = item.getAttribute('p') || '';
+        const parts = p.split(',');
+        if (parts.length < 2) {
+          console.warn('[PADPlayer] 跳过格式不对的弹幕, idx=', idx, 'p=', p);
+          return;
+        }
+
+        const time  = parseFloat(parts[0]) || 0;
+        const mode  = parseInt(parts[1]) || 1;
+        const size  = parseInt(parts[2]) || 25;
+        const color = parseInt(parts[3]) || 16777215;
+        const pool  = parseInt(parts[5]) || 0;
+        const date  = parts[4]
+          ? new Date(parseInt(parts[4]) * 1000).toLocaleString()
+          : new Date().toLocaleString();
+
+        // 去重键：时间+模式+字号+颜色+内容
+        const key = `${time}|${mode}|${size}|${color}|${pool}|${item.textContent}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+
+        result.push(new CommentData(mode, time, color, size, item.textContent || '', date, pool));
+      });
+    } catch(e) {
+      console.error('[PADPlayer] 解析弹幕 XML 出错:', e);
+    }
+    return result;
+  }
+
+  onLocalDanmakuLoaded(list) {
+    this.cm.init(list);
+    this.localDanmaku = list;
+    this.updateDanmakuList();
+    this.els.dmcont.value = '弹幕 ' + list.length + ' 条';
+    if (this.anyLoaded) {
+      this.els.video.play().catch(()=>{});
+      this.enableAll();
+      this.els.pb.textContent = '⏸';
+      this.anyLoaded = false;
+    } else {
+      this.anyLoaded = true;
+      // 修复：如果视频已经就绪但之前加载失败，也解锁控件
+      if (this.els.video.readyState >= 1 || this.els.video.duration) {
+        this.enableAll();
+      }
+    }
+  }
+
+  updateDanmakuList() {
+    const tb = this.els.cdgBody;
+    tb.innerHTML = '';
+    this.localDanmaku.forEach(d => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${this.formatTimes(d.time)}</td><td title="${this.escapeHtml(d.txt)}">${this.escapeHtml(d.txt)}</td><td>${d.date}</td>`;
+      tr._data = d;
+      tb.appendChild(tr);
+    });
+  }
+
+  escapeHtml(t) {
+    const d = document.createElement('div');
+    d.textContent = t;
+    return d.innerHTML;
+  }
+
+  sendLocalDanmaku(cd) {
+    this.localDanmaku.push(cd);
+    this.cm.addComment(cd);
+    this.els.dmcont.value = '弹幕 ' + this.cm.Dmlength() + ' 条';
+    this.updateDanmakuList();
+    const tb = this.els.cdgBody;
+    tb.scrollTop = tb.scrollHeight;
+  }
+
+  onMetaLoad() {
+    const v = this.els.video;
+    this.tot = this.formatTime(v.duration || 0);
+    this.els.ps.max = v.duration || 100;
+    this.els.tl.textContent = '0:00/' + this.tot;
+    if (this.anyLoaded) {
+      v.play().catch(()=>{});
+      this.enableAll();
+      this.els.pb.textContent = '⏸';
+      this.anyLoaded = false;
+    } else {
+      this.anyLoaded = true;
+    }
+  }
+
+  onVError() {
+    const v = this.els.video;
+    const err = v.error;
+    let errCode = err ? err.code : 'unknown';
+    console.log('[PADPlayer] video error, code=' + errCode + ', path=' + this.currentVideoPath);
+    this.els.txtsktinfo.textContent = '视频载入错误 (code:' + errCode + ')，请检查文件';
+    // 修复：视频加载失败时也标记 anyLoaded，让弹幕加载完成后能解锁控件
+    if (!this.anyLoaded) this.anyLoaded = true;
+  }
+
+  onProgress() {
+    // 缓冲进度
+  }
+
+  onEnded() {
+    if (this.xunhuan) {
+      this.els.video.currentTime = 0;
+      this.cm.resetTime(0);
+      this.cm.resume();
+      this.els.video.play().catch(()=>{});
+      this.els.pb.textContent = '⏸';
+    } else {
+      this.els.pb.textContent = '▶';
+      this.els.ply.style.display = 'block';
+      this.cm.pause();
+    }
+  }
+
+  enableAll() {
+    this.els.pb.disabled = false;
+    this.els.cob.disabled = false;
+    this.els.vs.disabled = false;
+    this.els.ps.disabled = false;
+    this.els.csb.disabled = false;
+    this.els.cti.disabled = false;
+    this.els.ply.style.display = 'none';
+    this.els.video.volume = parseFloat(this.els.vs.value);
+    const fileName = this.currentVideoPath ? this.currentVideoPath.split('/').pop() : '';
+    this.els.txtsktinfo.textContent = '本地弹幕模式 - 播放中: ' + fileName;
+  }
+
+  disableAll() {
+    this.els.pb.disabled = true;
+    this.els.cob.disabled = true;
+    this.els.vs.disabled = true;
+    this.els.ps.disabled = true;
+    this.els.csb.disabled = true;
+    this.els.cti.disabled = true;
+  }
+
+  onPlay() {
+    const v = this.els.video;
+    if (v.paused || v.ended) {
+      v.play().catch(()=>{});
+      this.cm.resume();
+      this.els.pb.textContent = '⏸';
+      this.els.ply.style.display = 'none';
+    } else {
+      v.pause();
+      this.cm.pause();
+      this.els.pb.textContent = '▶';
+      this.els.ply.style.display = 'block';
+    }
+  }
+
+  onPlaying(e) {
+    const v = this.els.video;
+    if (v.readyState < 1) return;
+    if (this._seeking) {
+      const val = parseFloat(e.target.value);
+      this.els.tl.textContent = this.formatTime(val) + '/' + this.tot;
+      return;
+    }
+    v.currentTime = parseFloat(e.target.value);
+    this.cm.resetTime(v.currentTime);
+    this.els.ply.style.display = 'none';
+    this.els.pb.textContent = '⏸';
+  }
+
+  formatTime(s) {
+    if (!isFinite(s)) return '0:00';
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+  formatTimes(s) {
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  muix() {
+    const v = this.els.video;
+    if (v.volume !== 0) {
+      v.volume = 0;
+      this.els.mucor.textContent = '🔇';
+    } else {
+      v.volume = parseFloat(this.els.vs.value);
+      this.els.mucor.textContent = '🔊';
+    }
+  }
+
+  soundAdjust(e) {
+    const val = parseFloat(e.target.value);
+    if (val === 0) { this.muix(); return; }
+    this.els.mucor.textContent = '🔊';
+    this.els.video.volume = val;
+  }
+
+  onFMode() {
+    this.mf.removeALL();
+    if (!this.els._mode1.classList.contains('active')) this.mf.addMode(1);
+    if (!this.els._mode4.classList.contains('active')) this.mf.addMode(4);
+    if (!this.els._mode5.classList.contains('active')) this.mf.addMode(5);
+    if (!this.els._mode6.classList.contains('active')) this.mf.addMode(6);
+  }
+
+  onpool() {
+    CommentManager.nopool = [];
+    if (!this.els.vspool0.checked) CommentManager.nopool.push(0);
+    if (!this.els.vspool1.checked) CommentManager.nopool.push(1);
+    if (!this.els.vspool2.checked) CommentManager.nopool.push(2);
+  }
+
+  onAddKWB() {
+    const v = this.els.kwinput.value.trim();
+    if (!v) return;
+    const items = Array.from(this.els.filterkwlist.children).map(c => c.textContent);
+    if (items.includes(v)) return;
+    this.addKWItem(v);
+    this.kf.keywords.push(v);
+    this.els.kwinput.value = '';
+  }
+
+  addKWItem(v) {
+    const div = document.createElement('div');
+    div.textContent = v;
+    this.els.filterkwlist.appendChild(div);
+    div.addEventListener('click', () => {
+      Array.from(this.els.filterkwlist.children).forEach(c => c.classList.remove('selected'));
+      div.classList.add('selected');
+    });
+  }
+
+  onDelKWB() {
+    const sel = this.els.filterkwlist.querySelector('.selected');
+    if (!sel) return;
+    const idx = Array.from(this.els.filterkwlist.children).indexOf(sel);
+    this.kf.keywords.splice(idx, 1);
+    sel.remove();
+  }
+
+  xunhuani() {
+    this.xunhuan = !this.xunhuan;
+    this.els.xunhuanb.title = this.xunhuan ? '洗脑循环 on!' : '洗脑循环 off';
+    this.els.xunhuanb.style.color = this.xunhuan ? '#f00' : '';
+  }
+
+  ycpl() {
+    const layer = this.els['danmaku-layer'];
+    if (layer.style.display === 'none') {
+      layer.style.display = 'block';
+      this.els.cob.textContent = '💬';
+      this.els.cob.title = '隐藏评论';
+    } else {
+      layer.style.display = 'none';
+      this.els.cob.textContent = '🚫';
+      this.els.cob.title = '显示评论';
+    }
+  }
+
+  // ===================== 修复：删除重复的 cm.addComment =====================
+  onSend() {
+    const v = this.els.video;
+    if (v.readyState < 1) return;
+    if (this.els.csb.disabled) return;
+    const txt = this.els.cti.value;
+    if (!txt || txt.trim() === '') return;
+
+    // 彩蛋
+    if (txt.indexOf('瞎了我的狗眼') > -1 || txt === 'my eyes!!!') {
+      v.style.filter = 'blur(20px)';
+    } else if (txt.indexOf('我有霸气爷们眼') > -1 || txt.indexOf('双眼一亮') > -1 || txt.indexOf('我做好瞎狗眼的觉悟了') > -1 || txt.indexOf('变态有什么错的') > -1 || txt.indexOf('狗眼是拿来抛弃的东西') > -1) {
+      v.style.filter = '';
+    }
+    if (txt.indexOf('撸多了会双眼模糊') > -1) {
+      document.getElementById('app').style.filter = 'blur(4px)';
+    }
+    if (txt.indexOf('不要平滑') > -1) {
+      v.style.imageRendering = 'pixelated';
+    } else if (txt.indexOf('给爷平滑') > -1) {
+      v.style.imageRendering = 'auto';
+    }
+    if (txt.indexOf('要看黑白电视') > -1) {
+      v.style.filter = 'grayscale(100%)';
+    } else if (txt.indexOf('还是看彩色电视吧') > -1) {
+      v.style.filter = '';
+    }
+    if (txt.indexOf('给爷全屏') > -1) {
+      this.onFS();
+    }
+
+    const pool = parseInt(document.querySelector('input[name="pool"]:checked').value);
+    const cd = new CommentData(
+      this.mdcValue,
+      v.currentTime,
+      parseInt(this.els.cpk.value.replace('#',''), 16),
+      parseInt(this.els.fsc.value),
+      txt,
+      new Date().toLocaleString(),
+      pool,
+      true
+    );
+
+    if (this.sfc.filter([cd])) return;
+
+    // 只通过 sendLocalDanmaku 统一添加，避免重复
+    this.sendLocalDanmaku(cd);
+    this.els.cti.value = '';
+  }
+
+  btnOK_Enter(e) {
+    if (e.ctrlKey && e.key === 'Enter') {
+      this.els.cti.value += '\r';
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      this.onSend();
+    }
+  }
+
+  onFS() {
+    const app = document.getElementById('app');
+    if (!document.fullscreenElement) {
+      app.requestFullscreen().catch(()=>{});
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  fullScreenHandler() {
+    const app = document.getElementById('app');
+    const isFS = !!document.fullscreenElement;
+    if (isFS) {
+      app.classList.add('fullscreen');
+      this.cm.setsduration(window.innerWidth / 537 * 3000);
+    } else {
+      app.classList.remove('fullscreen');
+      this.cm.setsduration(3500);
+    }
+  }
+
+  WHbh(type) {
+    const inner = this.els['video-inner'];
+    const v = this.els.video;
+    if (type === 'default') {
+      inner.style.width = '100%';
+      inner.style.height = '100%';
+      inner.style.paddingBottom = '0';
+      v.style.position = 'relative';
+      v.style.width = '';
+      v.style.height = '';
+    } else if (type === '43') {
+      inner.style.width = '100%';
+      inner.style.height = '0';
+      inner.style.paddingBottom = '75%';
+      inner.style.position = 'relative';
+      v.style.position = 'absolute';
+      v.style.width = '100%';
+      v.style.height = '100%';
+    } else if (type === '169') {
+      inner.style.width = '100%';
+      inner.style.height = '0';
+      inner.style.paddingBottom = '56.25%';
+      inner.style.position = 'relative';
+      v.style.position = 'absolute';
+      v.style.width = '100%';
+      v.style.height = '100%';
+    }
+  }
+}
+
+// 启动
+window.player = new PADPlayer();
+</script>
+</body>
+</html>
