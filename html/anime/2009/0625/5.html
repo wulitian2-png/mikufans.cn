@@ -1,6 +1,6 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>【AMV】Love Story_Mikufans</title>
@@ -8,11 +8,10 @@
 <meta name="description" content="By: whispersreloaded Аnime: Shugo Chara (Manga) Мusic: Taylor Swift - Love Story" />
 <link href="../../../../templets/style/dedecms.css" rel="stylesheet" media="screen" type="text/css" />
 <script language="javascript" type="text/javascript" src="../../../../include/dedeajax2.js"></script>
-<script language="javascript" type="text/javascript">
-<!--
+<script type="text/javascript">
  function postDigg(ftype,aid)
  {
-	var taget_obj = document.getElementById('newdigg');
+	var target_obj = document.getElementById('newdigg');
 	var saveid = GetCookie('diggid');
 	if(saveid != null)
 	{
@@ -39,13 +38,13 @@
 	{
 		SetCookie('diggid',aid,1);
 	}
-	myajax = new DedeAjax(taget_obj,false,false,'','','');
+	myajax = new DedeAjax(target_obj,false,false,'','','');
 	myajax.SendGet2("./plus/feedback.php?action="+ftype+"&aid="+aid+"&formarc=1");
 	DedeXHTTP = null;
 }
 	function postBadGood(ftype,fid)
 	{
-		var taget_obj = document.getElementById(ftype+fid);
+		var target_obj = document.getElementById(ftype+fid);
 		var saveid = GetCookie('badgoodid');
 		if(saveid != null)
 		{
@@ -74,21 +73,21 @@
 		}
 		//document.write("feedback.php?action="+ftype+"&fid="+fid);
 		//return;
-	  myajax = new DedeAjax(taget_obj,false,false,'','','');
+	  myajax = new DedeAjax(target_obj,false,false,'','','');
 	  myajax.SendGet2("./plus/feedback.php?aid="+fid+"&action="+ftype+"&fid="+fid);
 	  DedeXHTTP = null;
 	}
 	function getDigg(aid)
 	{
-		var taget_obj = document.getElementById('newdigg');
-		myajax = new DedeAjax(taget_obj,false,false,'','','');
+		var target_obj = document.getElementById('newdigg');
+		myajax = new DedeAjax(target_obj,false,false,'','','');
 		myajax.SendGet2("./plus/feedback.php?action=showDigg&aid="+aid);
 		DedeXHTTP = null;
 	}
 
--->
 </script>
 
+<base target="_blank">
 </head>
 <body class="articleview">
 <div class="header">
@@ -190,7 +189,7 @@
 					</div>
 				</div>
 			</div>
-			 <script language="javascript" type="text/javascript">getDigg(5);</script>
+			 <script type="text/javascript">getDigg(5);</script>
 			<div class="boxoff">
 				<strong>------分隔线----------------------------</strong>
 			</div>
@@ -230,7 +229,7 @@ function AjaxPage_tg(p){loadfeeback_tg(5,p)}
 
 <div class="footer w960 center mt1 clear">
 	<p class="powered">
-		Powered by <a href="./" title="mikufans" target="_blank"><strong>PADfans.cn<span> V3.3</span></strong></a> &copy; 2008-2009 <a href="./" target="_blank">PAD</a>    Inc.	</p>
+		Powered by <a href="../../../../index.html" title="mikufans" target="_blank"><strong>PADfans.cn<span> V3.3</span></strong></a> &copy; 2008-2009 <a href="./" target="_blank">PAD</a>    Inc.	</p>
 <!-- /powered -->
 	<p class="copyright">
 		Copyright &copy; 2008-2009 PAD科技 版权所有!    
