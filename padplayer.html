@@ -374,6 +374,7 @@ video {
 </style>
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 <div id="app">
@@ -390,6 +391,7 @@ video {
     </div>
   </div>
 
+
   <div id="controls">
     <button id="pb" title="播放/暂停">▶</button>
     <input type="range" id="ps" min="0" max="100" value="0" step="0.1" title="时空跃迁">
@@ -400,6 +402,7 @@ video {
     <button id="xunhuanb" title="洗脑循环 off">🔁</button>
     <button id="fsbtn" title="全屏播放">⛶</button>
   </div>
+
 
   <div id="sender">
     <button id="msds" title="弹幕模式选择">弹幕模式</button>
@@ -415,6 +418,7 @@ video {
     <input type="text" id="cti" placeholder="回车发送" title="回车发送." maxlength="220">
     <button id="csb" type="button" disabled title="毁灭的喷射白光!da!">发送评论</button>
   </div>
+
 
   <div id="right-panel">
     <div class="tab-header">
@@ -452,10 +456,12 @@ video {
     </div>
   </div>
 
+
   <div id="bottom-bar">
     <span id="txtsktinfo">本地弹幕模式 - 初始化中</span>
     <input type="text" id="dmcont" readonly value="弹幕 0 条">
   </div>
+
 
   <div id="titleq" class="popup" style="display:none;">
     <div class="popup-title">
@@ -474,6 +480,7 @@ video {
       <button id="dm3" title="逆向滚动">逆向</button>
     </div>
   </div>
+
 
   <div id="systemconfig" class="popup" style="display:none;">
     <div class="popup-title">
@@ -495,12 +502,15 @@ video {
     </div>
   </div>
 
+
   <button id="cofgs" style="position:absolute; left:770px; top:3px; width:16px; height:16px; cursor:pointer; z-index:50; border:none; background:none; font-size:14px;" title="弹幕相关设置">⚙</button>
 </div>
+
 
 <script>
 window.CommentCommapl = 1;
 window.CommentCommaMB = 0;
+
 
 class CommentData {
   constructor(mode, time, color, size, txt, date, pool, isSelf) {
@@ -517,6 +527,7 @@ class CommentData {
   }
 }
 
+
 class ModeFilter {
   constructor(modes) { this.modes = modes || []; }
   addMode(m) { const n = parseInt(m); if (!this.modes.includes(n)) this.modes.push(n); }
@@ -525,16 +536,19 @@ class ModeFilter {
   filter(items) { return items.some(item => this.modes.includes(item.mode)); }
 }
 
+
 class KWFilter {
   constructor(keywords) { this.keywords = keywords || []; }
   filter(items) { return items.some(item => this.keywords.some(k => item.txt.includes(k))); }
 }
+
 
 class FilterChain {
   constructor() { this.filters = []; }
   addFilter(f) { this.filters.push(f); }
   filter(items) { return this.filters.some(f => f.filter(items)); }
 }
+
 
 class CommentManager {
   constructor(container, config) {
@@ -556,10 +570,12 @@ class CommentManager {
     this._recentSent = [];
   }
 
+
   init(data) {
     this.comments = data.sort((a, b) => a.time - b.time);
     this.clearAll();
   }
+
 
   displayComments(t) {
     if (this.paused) return;
@@ -580,9 +596,11 @@ class CommentManager {
     this.lastTime = t;
   }
 
+
   show(data) {
     if (CommentManager.nopool.includes(data.pool)) return;
     if (this.filterChain && this.filterChain.filter([data])) return;
+
 
     const el = document.createElement("div");
     el.className = "danmaku-item";
@@ -592,14 +610,17 @@ class CommentManager {
     el.style.fontSize = data.size + "px";
     el.style.opacity = window.CommentCommapl || 1;
 
+
     const mb = parseInt(window.CommentCommaMB || 0);
     if (mb === 0) el.style.textShadow = "1px 1px 2px #000, -1px -1px 2px #000, 1px -1px 2px #000, -1px 1px 2px #000";
     else if (mb === 1) el.style.textShadow = "1px 1px 1px #000";
     else if (mb === 2) el.style.textShadow = "2px 2px 2px rgba(0,0,0,0.5)";
 
+
     const w = this.container.clientWidth;
     const h = this.container.clientHeight;
     const trackHeight = Math.max(28, data.size + 4);
+
 
     if (data.mode === 1) {
       const tracks = Math.max(1, Math.floor(h / trackHeight));
@@ -634,6 +655,7 @@ class CommentManager {
       };
       this.activeAnimations.push({ el, anim, data });
 
+
     } else if (data.mode === 5) {
       el.style.top = "10px";
       el.style.left = "50%";
@@ -654,6 +676,7 @@ class CommentManager {
       };
       this.activeAnimations.push({ el, anim, data });
 
+
     } else if (data.mode === 4) {
       el.style.bottom = "10px";
       el.style.left = "50%";
@@ -673,6 +696,7 @@ class CommentManager {
         if (idx !== -1) this.activeAnimations.splice(idx, 1);
       };
       this.activeAnimations.push({ el, anim, data });
+
 
     } else if (data.mode === 6) {
       const tracks = Math.max(1, Math.floor(h / trackHeight));
@@ -709,6 +733,7 @@ class CommentManager {
     }
   }
 
+
   clearAll() {
     this.activeAnimations.forEach(({ anim }) => anim.cancel());
     this.activeAnimations = [];
@@ -719,12 +744,12 @@ class CommentManager {
     this.reverseRollingTracks = [];
   }
 
+
   resetTime(t) {
     this.lastTime = t;
+    // 所有弹幕（包括自己发送的）统一按时间重置显示状态
     this.comments.forEach(c => {
-      if (!c.isSelf) {
-        c._displayed = c.time < t;
-      }
+      c._displayed = c.time < t;
     });
     this.container.innerHTML = "";
     this.activeAnimations.forEach(({ anim }) => anim.cancel());
@@ -733,7 +758,9 @@ class CommentManager {
     this.reverseRollingTracks = [];
   }
 
+
   Timereset(t) { this.resetTime(t); }
+
 
   pause() {
     this.paused = true;
@@ -742,12 +769,14 @@ class CommentManager {
     });
   }
 
+
   resume() {
     this.paused = false;
     this.activeAnimations.forEach(({ anim }) => {
       if (anim.playState === "paused") anim.play();
     });
   }
+
 
   addComment(cd) {
     this.comments.push(cd);
@@ -757,11 +786,13 @@ class CommentManager {
     this.show(cd);
   }
 
+
   Dmlength() { return this.comments.length; }
   setsduration(v) { this.sduration = v; }
   setvelocity(v) { this.velocity = v; }
 }
 CommentManager.nopool = [];
+
 
 class PADPlayer {
   constructor() {
@@ -781,11 +812,13 @@ class PADPlayer {
     this._seeking = false;
     this.currentVideoPath = "";
 
+
     this.els = {};
     this.initElements();
     this.bindEvents();
     this.loadConfig();
   }
+
 
   initElements() {
     const ids = ["video","video-inner","danmaku-layer","pb","ps","tl","mucor","vs","cob","xunhuanb","fsbtn",
@@ -796,6 +829,7 @@ class PADPlayer {
     ids.forEach(id => this.els[id] = document.getElementById(id));
     this.els.cdgBody = this.els.cdg.querySelector("tbody");
   }
+
 
   bindEvents() {
     const v = this.els.video;
@@ -815,8 +849,10 @@ class PADPlayer {
       this.cm.pause();
     });
 
+
     this.els.pb.addEventListener("click", () => this.onPlay());
     this.els.ply.addEventListener("click", () => this.onPlay());
+
 
     this.els.ps.addEventListener("input", (e) => {
       const v = this.els.video;
@@ -843,25 +879,31 @@ class PADPlayer {
       this.els.ply.style.display = "none";
     });
 
+
     this.els.vs.addEventListener("input", (e) => this.soundAdjust(e));
     this.els.mucor.addEventListener("click", () => this.muix());
+
 
     this.els.cob.addEventListener("click", () => this.ycpl());
     this.els.xunhuanb.addEventListener("click", () => this.xunhuani());
     this.els.fsbtn.addEventListener("click", () => this.onFS());
 
+
     this.els.csb.addEventListener("click", () => this.onSend());
     this.els.cti.addEventListener("keydown", (e) => this.btnOK_Enter(e));
     this.els.msds.addEventListener("click", () => { this.els.titleq.style.display = "block"; });
+
 
     this.els.btutcq.addEventListener("click", () => { this.els.titleq.style.display = "none"; });
     this.els.btutcx.addEventListener("click", () => { this.els.systemconfig.style.display = "none"; });
     this.els.cofgs.addEventListener("click", () => { this.els.systemconfig.style.display = "block"; });
 
+
     this.els.dm1.addEventListener("click", () => { this.mdcValue = 5; this.els.titleq.style.display = "none"; });
     this.els.dm2.addEventListener("click", () => { this.mdcValue = 1; this.els.titleq.style.display = "none"; });
     this.els.dm3.addEventListener("click", () => { this.mdcValue = 6; this.els.titleq.style.display = "none"; });
     this.els.dm4.addEventListener("click", () => { this.mdcValue = 4; this.els.titleq.style.display = "none"; });
+
 
     document.querySelectorAll(".tab-btn").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -872,6 +914,7 @@ class PADPlayer {
       });
     });
 
+
     ["_mode1","_mode4","_mode5","_mode6"].forEach(id => {
       const btn = this.els[id];
       btn.addEventListener("click", () => {
@@ -880,20 +923,25 @@ class PADPlayer {
       });
     });
 
+
     ["vspool0","vspool1","vspool2"].forEach(id => {
       this.els[id].addEventListener("click", () => this.onpool());
     });
 
+
     this.els.addkwb.addEventListener("click", () => this.onAddKWB());
     this.els.delkwb.addEventListener("click", () => this.onDelKWB());
     this.els.kwinput.addEventListener("keydown", (e) => { if(e.key==="Enter") this.onAddKWB(); });
+
 
     this.els.vapl.addEventListener("input", (e) => { window.CommentCommapl = parseFloat(e.target.value); });
     document.querySelectorAll('input[name="dmMB"]').forEach(r => {
       r.addEventListener("change", () => { window.CommentCommaMB = parseInt(r.value); });
     });
 
+
     document.addEventListener("fullscreenchange", () => this.fullScreenHandler());
+
 
     this.els.cdgBody.addEventListener("click", (e) => {
       const tr = e.target.closest("tr");
@@ -909,12 +957,15 @@ class PADPlayer {
       this.cm.resetTime(t);
     });
 
+
     document.querySelectorAll("#spwh button").forEach(b => {
       b.addEventListener("click", () => this.WHbh(b.dataset.wh));
     });
 
+
     requestAnimationFrame(() => this.loop());
   }
+
 
   loop() {
     const v = this.els.video;
@@ -929,6 +980,7 @@ class PADPlayer {
     }
     requestAnimationFrame(() => this.loop());
   }
+
 
   loadConfig() {
     fetch("./pad.xml")
@@ -965,6 +1017,7 @@ class PADPlayer {
       .catch(() => this.onConfigLoaded(this.getDefaultConfig()));
   }
 
+
   getDefaultConfig() {
     return {
       constv: true, velocity: 4000, sduration: 3500, alphaTo: 1,
@@ -973,15 +1026,18 @@ class PADPlayer {
     };
   }
 
+
   onConfigLoaded(config) {
     this.config = config;
     this.kf = new KWFilter(config.keywords);
     this.sfc = new FilterChain();
     this.sfc.addFilter(this.kf);
 
+
     const fc = new FilterChain();
     fc.addFilter(this.mf);
     fc.addFilter(this.kf);
+
 
     this.cm = new CommentManager(this.els["danmaku-layer"], {
       poolsize: config.poolsize,
@@ -993,12 +1049,15 @@ class PADPlayer {
       filterChain: fc
     });
 
+
     config.keywords.forEach(k => this.addKWItem(k));
+
 
     const p = new URLSearchParams(location.search);
     const file = p.get("file");
     const id = p.get("id");
     const vid = p.get("vid") || p.get("avid") || p.get("qid") || p.get("ykid") || p.get("uid");
+
 
     if (file && id) {
       this.loadLocalVideo(file, id);
@@ -1008,8 +1067,10 @@ class PADPlayer {
       this.loadLocalVideo("av1.mp4", "1");
     }
 
+
     this.initLocalUser();
   }
+
 
   initLocalUser() {
     this.els.txtsktinfo.textContent = "本地弹幕模式 - 已就绪";
@@ -1017,26 +1078,32 @@ class PADPlayer {
     this.els.dmcont.value = "弹幕 0 条";
   }
 
+
   loadLocalVideo(file, id) {
     this.avId = id;
     this.mode = "FILE";
     const videoPath = "./video/" + file;
     this.currentVideoPath = videoPath;
 
+
     console.log("[PADPlayer] 加载视频:", videoPath);
     this.els.txtsktinfo.textContent = "加载视频: " + file;
 
+
     this.els.video.src = videoPath;
     this.els.video.load();
+
 
     this.loadLocalDanmaku(id);
     this.disableAll();
   }
 
+
   loadLocalDanmaku(id) {
     const path = "./danmaku/av" + id + ".xml";
     console.log("[PADPlayer] 请求弹幕:", path);
     this.els.txtsktinfo.textContent += " | 弹幕: av" + id + ".xml";
+
 
     fetch(path)
       .then(r => {
@@ -1058,6 +1125,7 @@ class PADPlayer {
       });
   }
 
+
   parseLocalDanmaku(xmlText) {
     const result = [];
     const seen = new Set();
@@ -1067,6 +1135,7 @@ class PADPlayer {
       const items = xml.querySelectorAll("d");
       console.log("[PADPlayer] XML 中 <d> 标签数:", items.length);
 
+
       items.forEach((item, idx) => {
         const p = item.getAttribute("p") || "";
         const parts = p.split(",");
@@ -1074,6 +1143,7 @@ class PADPlayer {
           console.warn("[PADPlayer] 跳过格式不对的弹幕, idx=", idx, "p=", p);
           return;
         }
+
 
         const time  = parseFloat(parts[0]) || 0;
         const mode  = parseInt(parts[1]) || 1;
@@ -1084,9 +1154,11 @@ class PADPlayer {
           ? new Date(parseInt(parts[4]) * 1000).toLocaleString()
           : new Date().toLocaleString();
 
+
         const key = time + "|" + mode + "|" + size + "|" + color + "|" + pool + "|" + item.textContent;
         if (seen.has(key)) return;
         seen.add(key);
+
 
         result.push(new CommentData(mode, time, color, size, item.textContent || "", date, pool));
       });
@@ -1095,6 +1167,7 @@ class PADPlayer {
     }
     return result;
   }
+
 
   onLocalDanmakuLoaded(list) {
     this.cm.init(list);
@@ -1114,6 +1187,7 @@ class PADPlayer {
     }
   }
 
+
   updateDanmakuList() {
     const tb = this.els.cdgBody;
     tb.innerHTML = "";
@@ -1125,23 +1199,28 @@ class PADPlayer {
     });
   }
 
+
   escapeHtml(t) {
     const d = document.createElement("div");
     d.textContent = t;
     return d.innerHTML;
   }
 
+
   sendLocalDanmaku(cd) {
     const now = Date.now();
     this.cm._recentSent = this.cm._recentSent || [];
     this.cm._recentSent = this.cm._recentSent.filter(s => now - s.ts < 5000);
+
 
     const dup = this.cm._recentSent.some(s =>
       s.txt === cd.txt && s.mode === cd.mode && s.color === cd.color
     );
     if (dup) return;
 
+
     this.cm._recentSent.push({ txt: cd.txt, mode: cd.mode, color: cd.color, ts: now });
+
 
     this.localDanmaku.push(cd);
     this.cm.addComment(cd);
@@ -1150,6 +1229,7 @@ class PADPlayer {
     const tb = this.els.cdgBody;
     tb.scrollTop = tb.scrollHeight;
   }
+
 
   onMetaLoad() {
     const v = this.els.video;
@@ -1169,6 +1249,7 @@ class PADPlayer {
     }
   }
 
+
   onVError() {
     const v = this.els.video;
     const err = v.error;
@@ -1178,8 +1259,10 @@ class PADPlayer {
     if (!this.anyLoaded) this.anyLoaded = true;
   }
 
+
   onProgress() {
   }
+
 
   onEnded() {
     if (this.xunhuan) {
@@ -1190,6 +1273,7 @@ class PADPlayer {
       this.cm.pause();
     }
   }
+
 
   enableAll() {
     this.els.pb.disabled = false;
@@ -1210,6 +1294,7 @@ class PADPlayer {
     this.els.txtsktinfo.textContent = "本地弹幕模式 - 播放中: " + fileName;
   }
 
+
   disableAll() {
     this.els.pb.disabled = true;
     this.els.cob.disabled = true;
@@ -1219,6 +1304,7 @@ class PADPlayer {
     this.els.cti.disabled = true;
   }
 
+
   onPlay() {
     const v = this.els.video;
     if (v.paused || v.ended) {
@@ -1227,6 +1313,7 @@ class PADPlayer {
       v.pause();
     }
   }
+
 
   onPlaying(e) {
     const v = this.els.video;
@@ -1242,6 +1329,7 @@ class PADPlayer {
     this.els.pb.textContent = "⏸";
   }
 
+
   formatTime(s) {
     if (!isFinite(s)) return "0:00";
     const m = Math.floor(s / 60);
@@ -1254,6 +1342,7 @@ class PADPlayer {
     return (m < 10 ? "0" : "") + m + ":" + (sec < 10 ? "0" : "") + sec;
   }
 
+
   muix() {
     const v = this.els.video;
     if (v.volume !== 0) {
@@ -1265,12 +1354,14 @@ class PADPlayer {
     }
   }
 
+
   soundAdjust(e) {
     const val = parseFloat(e.target.value);
     if (val === 0) { this.muix(); return; }
     this.els.mucor.textContent = "🔊";
     this.els.video.volume = val;
   }
+
 
   onFMode() {
     this.mf.removeALL();
@@ -1280,12 +1371,14 @@ class PADPlayer {
     if (!this.els._mode6.classList.contains("active")) this.mf.addMode(6);
   }
 
+
   onpool() {
     CommentManager.nopool = [];
     if (!this.els.vspool0.checked) CommentManager.nopool.push(0);
     if (!this.els.vspool1.checked) CommentManager.nopool.push(1);
     if (!this.els.vspool2.checked) CommentManager.nopool.push(2);
   }
+
 
   onAddKWB() {
     const v = this.els.kwinput.value.trim();
@@ -1297,6 +1390,7 @@ class PADPlayer {
     this.els.kwinput.value = "";
   }
 
+
   addKWItem(v) {
     const div = document.createElement("div");
     div.textContent = v;
@@ -1307,6 +1401,7 @@ class PADPlayer {
     });
   }
 
+
   onDelKWB() {
     const sel = this.els.filterkwlist.querySelector(".selected");
     if (!sel) return;
@@ -1315,11 +1410,13 @@ class PADPlayer {
     sel.remove();
   }
 
+
   xunhuani() {
     this.xunhuan = !this.xunhuan;
     this.els.xunhuanb.title = this.xunhuan ? "洗脑循环 on!" : "洗脑循环 off";
     this.els.xunhuanb.style.color = this.xunhuan ? "#f00" : "";
   }
+
 
   ycpl() {
     const layer = this.els["danmaku-layer"];
@@ -1334,6 +1431,7 @@ class PADPlayer {
     }
   }
 
+
   onSend() {
     const v = this.els.video;
     if (v.readyState < 1) return;
@@ -1341,9 +1439,11 @@ class PADPlayer {
     const txt = this.els.cti.value;
     if (!txt || txt.trim() === "") return;
 
+
     if (this._sendBusy) return;
     this._sendBusy = true;
     setTimeout(() => { this._sendBusy = false; }, 800);
+
 
     if (txt.indexOf("瞎了我的狗眼") > -1 || txt === "my eyes!!!") {
       v.style.filter = "blur(20px)";
@@ -1367,6 +1467,7 @@ class PADPlayer {
       this.onFS();
     }
 
+
     const pool = parseInt(document.querySelector('input[name="pool"]:checked').value);
     const cd = new CommentData(
       this.mdcValue,
@@ -1379,11 +1480,14 @@ class PADPlayer {
       true
     );
 
+
     if (this.sfc.filter([cd])) return;
+
 
     this.sendLocalDanmaku(cd);
     this.els.cti.value = "";
   }
+
 
   // 修复：使用 \r 而非实际回车符，避免字符串跨行导致 SyntaxError
   btnOK_Enter(e) {
@@ -1397,6 +1501,7 @@ class PADPlayer {
     }
   }
 
+
   onFS() {
     const app = document.getElementById("app");
     if (!document.fullscreenElement) {
@@ -1405,6 +1510,7 @@ class PADPlayer {
       document.exitFullscreen();
     }
   }
+
 
   fullScreenHandler() {
     const app = document.getElementById("app");
@@ -1421,10 +1527,12 @@ class PADPlayer {
     }
   }
 
+
   WHbh(type) {
     const inner = this.els["video-inner"];
     const v = this.els.video;
     const box = document.getElementById("video-box");
+
 
     v.style.width = "";
     v.style.height = "";
@@ -1432,10 +1540,12 @@ class PADPlayer {
     v.style.maxHeight = "";
     v.style.objectFit = "";
 
+
     inner.style.cssText = "";
     inner.style.display = "flex";
     inner.style.alignItems = "center";
     inner.style.justifyContent = "center";
+
 
     if (type === "default") {
       inner.style.width = "100%";
@@ -1447,17 +1557,21 @@ class PADPlayer {
       return;
     }
 
+
     const boxW = box.clientWidth;
     const boxH = box.clientHeight;
     const ratio = type === "43" ? 3 / 4 : 9 / 16;
 
+
     let w = boxW;
     let h = w * ratio;
+
 
     if (h > boxH) {
       h = boxH;
       w = h / ratio;
     }
+
 
     inner.style.width = Math.floor(w) + "px";
     inner.style.height = Math.floor(h) + "px";
@@ -1466,11 +1580,13 @@ class PADPlayer {
     inner.style.top = "50%";
     inner.style.transform = "translate(-50%, -50%)";
 
+
     v.style.width = "100%";
     v.style.height = "100%";
     v.style.objectFit = "contain";
   }
 }
+
 
 window.player = new PADPlayer();
 </script>
