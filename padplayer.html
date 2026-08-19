@@ -1053,7 +1053,7 @@ class PADPlayer {
 
   onLocalDanmakuLoaded(list) {
     this.cm.init(list);
-    this.localDanmaku = list;
+    this.localDanmaku = [...list];  // 复制数组，避免和 cm.comments 共享引用
     this.updateDanmakuList();
     this.els.dmcont.value = '弹幕 ' + list.length + ' 条';
     if (this.anyLoaded) {
@@ -1088,10 +1088,10 @@ class PADPlayer {
   }
 
   sendLocalDanmaku(cd) {
-    // 去重兜底：最近 2 秒内相同内容不再添加
+    // 去重兜底：最近 3 秒内相同内容不再添加
     const now = Date.now();
     const last = this.localDanmaku[this.localDanmaku.length - 1];
-    if (last && last.txt === cd.txt && last.mode === cd.mode && last.color === cd.color && (now - (last._ts || 0)) < 2000) {
+    if (last && last.txt === cd.txt && last.mode === cd.mode && last.color === cd.color && (now - (last._ts || 0)) < 3000) {
       return;
     }
     cd._ts = now;
@@ -1114,6 +1114,11 @@ class PADPlayer {
       this.anyLoaded = false;
     } else {
       this.anyLoaded = true;
+      // 视频就绪但弹幕还没加载完，先同步一次按钮状态
+      if (v.paused) {
+        this.els.pb.textContent = '▶';
+        this.els.ply.style.display = 'block';
+      }
     }
   }
 
@@ -1148,7 +1153,14 @@ class PADPlayer {
     this.els.ps.disabled = false;
     this.els.csb.disabled = false;
     this.els.cti.disabled = false;
-    this.els.ply.style.display = 'none';
+    // 根据视频实际状态同步播放按钮
+    if (this.els.video.paused) {
+      this.els.pb.textContent = '▶';
+      this.els.ply.style.display = 'block';
+    } else {
+      this.els.pb.textContent = '⏸';
+      this.els.ply.style.display = 'none';
+    }
     this.els.video.volume = parseFloat(this.els.vs.value);
     const fileName = this.currentVideoPath ? this.currentVideoPath.split('/').pop() : '';
     this.els.txtsktinfo.textContent = '本地弹幕模式 - 播放中: ' + fileName;
