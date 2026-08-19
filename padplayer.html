@@ -1114,7 +1114,6 @@ class PADPlayer {
     }
   }
 
-  // 修复：使用模板字符串（反引号）避免引号转义导致的语法错误
   updateDanmakuList() {
     const tb = this.els.cdgBody;
     tb.innerHTML = "";
@@ -1386,11 +1385,11 @@ class PADPlayer {
     this.els.cti.value = "";
   }
 
+  // 修复：使用 \r 而非实际回车符，避免字符串跨行导致 SyntaxError
   btnOK_Enter(e) {
     if (e.isComposing) return;
     if (e.ctrlKey && e.key === "Enter") {
-      this.els.cti.value += "
-";
+      this.els.cti.value += "\r";
     } else if (e.key === "Enter") {
       e.preventDefault();
       e.stopPropagation();
