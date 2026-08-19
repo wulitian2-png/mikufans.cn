@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>PADplayer HTML5</title>
+<title>PADplayer HTML5 - 修复版</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
@@ -21,8 +21,6 @@ body {
   border: 1px solid #ccc;
 }
 
-
-/* 视频区 */
 #video-box {
   position: absolute;
   left: 0; top: 0;
@@ -79,8 +77,6 @@ video {
 }
 #spwh button:hover { background: #ddd; }
 
-
-/* 控制条 */
 #controls {
   position: absolute;
   left: 0; top: 386px;
@@ -118,8 +114,6 @@ video {
   color: #000;
 }
 
-
-/* 发送区 */
 #sender {
   position: absolute;
   left: 0; top: 415px;
@@ -168,8 +162,6 @@ video {
   color: #666;
 }
 
-
-/* 右侧面板 */
 #right-panel {
   position: absolute;
   left: 543px; top: 0;
@@ -214,8 +206,6 @@ video {
 }
 .tab-content.active { display: block; }
 
-
-/* 评论列表表格 */
 #cdg {
   width: 100%;
   border-collapse: collapse;
@@ -239,8 +229,6 @@ video {
 #cdg tbody tr:hover { background: #e8f0ff; cursor: pointer; }
 #cdg tbody tr.selected { background: #cce0ff; }
 
-
-/* 过滤面板 */
 .filter-row {
   margin-bottom: 8px;
   display: flex;
@@ -276,8 +264,6 @@ video {
 #filterkwlist div:nth-child(even) { background: #f9f9f9; }
 #filterkwlist div.selected { background: #cce0ff; }
 
-
-/* 底部状态栏 */
 #bottom-bar {
   position: absolute;
   left: 0; top: 441px;
@@ -302,8 +288,6 @@ video {
   margin-left: 535px;
 }
 
-
-/* 弹窗通用 */
 .popup {
   position: absolute;
   background: rgba(255,255,255,0.95);
@@ -332,8 +316,6 @@ video {
 }
 .popup-close:hover { color: #000; }
 
-
-/* 模式选择弹窗 */
 #titleq {
   left: 1px; top: 301px;
   width: 270px;
@@ -359,8 +341,6 @@ video {
   align-items: center;
 }
 
-
-/* 设置弹窗 */
 #systemconfig {
   left: 744px; top: 25px;
   width: 204px;
@@ -368,8 +348,6 @@ video {
 .config-row { margin-bottom: 8px; }
 .config-row label { display: block; margin-bottom: 2px; }
 
-
-/* 全屏调整 */
 #app.fullscreen {
   width: 100vw; height: 100vh;
   margin: 0;
@@ -384,8 +362,10 @@ video {
 #app.fullscreen #bottom-bar,
 #app.fullscreen #spwh { display: none; }
 #app.fullscreen #controls {
-  left: auto; right: 10px; bottom: 10px; top: auto;
-  width: 542px;
+  left: auto; right: 2%; bottom: 10px; top: auto;
+  width: 60%;
+  min-width: 542px;
+  max-width: 900px;
   position: fixed;
   z-index: 200;
   opacity: 0;
@@ -393,8 +373,6 @@ video {
 }
 #app.fullscreen:hover #controls { opacity: 1; }
 
-
-/* 弹幕样式 */
 .danmaku-item {
   position: absolute;
   white-space: nowrap;
@@ -408,15 +386,14 @@ video {
 </style>
 <base target="_blank">
 <base target="_blank">
-<base target="_blank">
 </head>
 <body>
 <div id="app">
   <div id="video-box">
     <div id="video-inner">
       <video id="video" preload="metadata" playsinline></video>
+      <div id="danmaku-layer"></div>
     </div>
-    <div id="danmaku-layer"></div>
     <div id="ply">▶</div>
     <div id="spwh">
       <button data-wh="default">默认</button>
@@ -424,7 +401,6 @@ video {
       <button data-wh="169">16:9</button>
     </div>
   </div>
-
 
   <div id="controls">
     <button id="pb" title="播放/暂停">▶</button>
@@ -436,7 +412,6 @@ video {
     <button id="xunhuanb" title="洗脑循环 off">🔁</button>
     <button id="fsbtn" title="全屏播放">⛶</button>
   </div>
-
 
   <div id="sender">
     <button id="msds" title="弹幕模式选择">弹幕模式</button>
@@ -452,7 +427,6 @@ video {
     <input type="text" id="cti" placeholder="回车发送" title="回车发送." maxlength="220">
     <button id="csb" type="button" disabled title="毁灭的喷射白光!da!">发送评论</button>
   </div>
-
 
   <div id="right-panel">
     <div class="tab-header">
@@ -490,14 +464,11 @@ video {
     </div>
   </div>
 
-
   <div id="bottom-bar">
     <span id="txtsktinfo">本地弹幕模式 - 初始化中</span>
     <input type="text" id="dmcont" readonly value="弹幕 0 条">
   </div>
 
-
-  <!-- 弹窗：弹幕模式 -->
   <div id="titleq" class="popup" style="display:none;">
     <div class="popup-title">
       <span>弹幕模式选择</span>
@@ -516,8 +487,6 @@ video {
     </div>
   </div>
 
-
-  <!-- 弹窗：设置 -->
   <div id="systemconfig" class="popup" style="display:none;">
     <div class="popup-title">
       <span>弹幕显示详细设置</span>
@@ -538,19 +507,13 @@ video {
     </div>
   </div>
 
-
-  <!-- 设置按钮 -->
   <button id="cofgs" style="position:absolute; left:770px; top:3px; width:16px; height:16px; cursor:pointer; z-index:50; border:none; background:none; font-size:14px;" title="弹幕相关设置">⚙</button>
 </div>
 
-
 <script>
-// ===================== 全局状态 =====================
 window.CommentCommapl = 1;
 window.CommentCommaMB = 0;
 
-
-// ===================== 工具类 =====================
 class CommentData {
   constructor(mode, time, color, size, txt, date, pool, isSelf) {
     this.mode = mode;
@@ -566,7 +529,6 @@ class CommentData {
   }
 }
 
-
 class ModeFilter {
   constructor(modes) { this.modes = modes || []; }
   addMode(m) { const n = parseInt(m); if (!this.modes.includes(n)) this.modes.push(n); }
@@ -575,12 +537,10 @@ class ModeFilter {
   filter(items) { return items.some(item => this.modes.includes(item.mode)); }
 }
 
-
 class KWFilter {
   constructor(keywords) { this.keywords = keywords || []; }
   filter(items) { return items.some(item => this.keywords.some(k => item.txt.includes(k))); }
 }
-
 
 class FilterChain {
   constructor() { this.filters = []; }
@@ -588,8 +548,6 @@ class FilterChain {
   filter(items) { return this.filters.some(f => f.filter(items)); }
 }
 
-
-// ===================== 弹幕管理器 =====================
 class CommentManager {
   constructor(container, config) {
     this.container = container;
@@ -605,21 +563,28 @@ class CommentManager {
     this.lastTime = 0;
     this.trackHeight = 28;
     this.rollingTracks = [];
+    this.reverseRollingTracks = [];
+    this.activeAnimations = [];
+    this._recentSent = [];
   }
-
 
   init(data) {
     this.comments = data.sort((a, b) => a.time - b.time);
     this.clearAll();
   }
 
-
   displayComments(t) {
     if (this.paused) return;
     this.comments.forEach(c => {
       if (c.time >= this.lastTime && c.time <= t && !c._displayed) {
-        if (CommentManager.nopool.includes(c.pool)) return;
-        if (this.filterChain && this.filterChain.filter([c])) return;
+        if (CommentManager.nopool.includes(c.pool)) {
+          c._displayed = true;
+          return;
+        }
+        if (this.filterChain && this.filterChain.filter([c])) {
+          c._displayed = true;
+          return;
+        }
         this.show(c);
         c._displayed = true;
       }
@@ -627,29 +592,32 @@ class CommentManager {
     this.lastTime = t;
   }
 
-
   show(data) {
-    const el = document.createElement('div');
-    el.className = 'danmaku-item';
+    // 统一弹幕池过滤（防御性编程，确保所有入口都生效）
+    if (CommentManager.nopool.includes(data.pool)) return;
+    if (this.filterChain && this.filterChain.filter([data])) return;
+
+    const el = document.createElement("div");
+    el.className = "danmaku-item";
     el.textContent = data.txt;
-    const hex = (data.color).toString(16).padStart(6, '0');
-    el.style.color = '#' + hex;
-    el.style.fontSize = data.size + 'px';
+    const hex = (data.color).toString(16).padStart(6, "0");
+    el.style.color = "#" + hex;
+    el.style.fontSize = data.size + "px";
     el.style.opacity = window.CommentCommapl || 1;
 
-
     const mb = parseInt(window.CommentCommaMB || 0);
-    if (mb === 0) el.style.textShadow = '1px 1px 2px #000, -1px -1px 2px #000, 1px -1px 2px #000, -1px 1px 2px #000';
-    else if (mb === 1) el.style.textShadow = '1px 1px 1px #000';
-    else if (mb === 2) el.style.textShadow = '2px 2px 2px rgba(0,0,0,0.5)';
-
+    if (mb === 0) el.style.textShadow = "1px 1px 2px #000, -1px -1px 2px #000, 1px -1px 2px #000, -1px 1px 2px #000";
+    else if (mb === 1) el.style.textShadow = "1px 1px 1px #000";
+    else if (mb === 2) el.style.textShadow = "2px 2px 2px rgba(0,0,0,0.5)";
 
     const w = this.container.clientWidth;
     const h = this.container.clientHeight;
 
+    // 根据弹幕字号动态计算轨道高度，避免大字号重叠
+    const trackHeight = Math.max(28, data.size + 4);
 
-    if (data.mode === 1) { // 滚动
-      const tracks = Math.max(1, Math.floor(h / this.trackHeight));
+    if (data.mode === 1) { // 滚动（正向）
+      const tracks = Math.max(1, Math.floor(h / trackHeight));
       let track = 0;
       for (let i = 0; i < tracks; i++) {
         if (!this.rollingTracks[i] || this.rollingTracks[i] < Date.now()) {
@@ -662,95 +630,172 @@ class CommentManager {
           this.rollingTracks[track] = Date.now() + this.velocity;
         }
       }
-      el.style.top = (track * this.trackHeight) + 'px';
-      el.style.left = w + 'px';
+      el.style.top = (track * trackHeight) + "px";
+      el.style.left = w + "px";
       this.container.appendChild(el);
       const elW = el.offsetWidth;
-      el.style.transition = `transform ${this.velocity}ms linear`;
-      requestAnimationFrame(() => {
-        el.style.transform = `translateX(-${w + elW + 20}px)`;
+
+      // 使用 Web Animations API 替代 CSS transition，实现播放/暂停/seek 完全同步
+      const anim = el.animate([
+        { transform: "translateX(0px)" },
+        { transform: "translateX(-" + (w + elW + 20) + "px)" }
+      ], {
+        duration: this.velocity,
+        easing: "linear",
+        fill: "forwards"
       });
-      setTimeout(() => { if(el.parentNode) el.remove(); }, this.velocity + 200);
-    } else if (data.mode === 5) { // 顶部
-      el.style.top = '10px';
-      el.style.left = '50%';
-      el.style.transform = 'translateX(-50%)';
+      anim.onfinish = () => {
+        if (el.parentNode) el.remove();
+        const idx = this.activeAnimations.findIndex(a => a.el === el);
+        if (idx !== -1) this.activeAnimations.splice(idx, 1);
+      };
+      this.activeAnimations.push({ el, anim, data });
+
+    } else if (data.mode === 5) { // 顶部固定
+      el.style.top = "10px";
+      el.style.left = "50%";
+      el.style.transform = "translateX(-50%)";
       this.container.appendChild(el);
-      setTimeout(() => { if(el.parentNode) el.remove(); }, this.sduration);
-    } else if (data.mode === 4) { // 底部
-      el.style.bottom = '10px';
-      el.style.left = '50%';
-      el.style.transform = 'translateX(-50%)';
+      const anim = el.animate([
+        { opacity: window.CommentCommapl || 1 },
+        { opacity: window.CommentCommapl || 1 }
+      ], {
+        duration: this.sduration,
+        easing: "linear",
+        fill: "forwards"
+      });
+      anim.onfinish = () => {
+        if (el.parentNode) el.remove();
+        const idx = this.activeAnimations.findIndex(a => a.el === el);
+        if (idx !== -1) this.activeAnimations.splice(idx, 1);
+      };
+      this.activeAnimations.push({ el, anim, data });
+
+    } else if (data.mode === 4) { // 底部固定
+      el.style.bottom = "10px";
+      el.style.left = "50%";
+      el.style.transform = "translateX(-50%)";
       this.container.appendChild(el);
-      setTimeout(() => { if(el.parentNode) el.remove(); }, this.sduration);
-    } else if (data.mode === 6) { // 逆向
-      const tracks = Math.max(1, Math.floor(h / this.trackHeight));
+      const anim = el.animate([
+        { opacity: window.CommentCommapl || 1 },
+        { opacity: window.CommentCommapl || 1 }
+      ], {
+        duration: this.sduration,
+        easing: "linear",
+        fill: "forwards"
+      });
+      anim.onfinish = () => {
+        if (el.parentNode) el.remove();
+        const idx = this.activeAnimations.findIndex(a => a.el === el);
+        if (idx !== -1) this.activeAnimations.splice(idx, 1);
+      };
+      this.activeAnimations.push({ el, anim, data });
+
+    } else if (data.mode === 6) { // 逆向滚动
+      // 使用独立的 reverseRollingTracks，避免与正向滚动共用轨道导致重叠
+      const tracks = Math.max(1, Math.floor(h / trackHeight));
       let track = 0;
       for (let i = 0; i < tracks; i++) {
-        if (!this.rollingTracks[i] || this.rollingTracks[i] < Date.now()) {
+        if (!this.reverseRollingTracks[i] || this.reverseRollingTracks[i] < Date.now()) {
           track = i;
-          this.rollingTracks[i] = Date.now() + this.velocity;
+          this.reverseRollingTracks[i] = Date.now() + this.velocity;
           break;
         }
         if (i === tracks - 1) {
           track = Math.floor(Math.random() * tracks);
-          this.rollingTracks[track] = Date.now() + this.velocity;
+          this.reverseRollingTracks[track] = Date.now() + this.velocity;
         }
       }
-      el.style.top = (track * this.trackHeight) + 'px';
-      el.style.left = '-300px';
+      el.style.top = (track * trackHeight) + "px";
+      el.style.left = "-300px";
       this.container.appendChild(el);
       const elW = el.offsetWidth;
-      el.style.transition = `transform ${this.velocity}ms linear`;
-      requestAnimationFrame(() => {
-        el.style.transform = `translateX(${w + elW + 20}px)`;
+
+      const anim = el.animate([
+        { transform: "translateX(0px)" },
+        { transform: "translateX(" + (w + elW + 20) + "px)" }
+      ], {
+        duration: this.velocity,
+        easing: "linear",
+        fill: "forwards"
       });
-      setTimeout(() => { if(el.parentNode) el.remove(); }, this.velocity + 200);
+      anim.onfinish = () => {
+        if (el.parentNode) el.remove();
+        const idx = this.activeAnimations.findIndex(a => a.el === el);
+        if (idx !== -1) this.activeAnimations.splice(idx, 1);
+      };
+      this.activeAnimations.push({ el, anim, data });
     }
   }
 
-
   clearAll() {
-    this.container.innerHTML = '';
+    this.activeAnimations.forEach(({ anim }) => anim.cancel());
+    this.activeAnimations = [];
+    this.container.innerHTML = "";
     this.comments.forEach(c => c._displayed = false);
     this.lastTime = 0;
     this.rollingTracks = [];
+    this.reverseRollingTracks = [];
   }
 
-
+  // 修复：resetTime 不重置用户自己发送弹幕的 _displayed 状态，避免 seek 后重复出现
   resetTime(t) {
     this.lastTime = t;
-    this.comments.forEach(c => { c._displayed = c.time < t; });
-    this.container.innerHTML = '';
+    this.comments.forEach(c => {
+      if (!c.isSelf) {
+        c._displayed = c.time < t;
+      }
+    });
+    this.container.innerHTML = "";
+    this.activeAnimations.forEach(({ anim }) => anim.cancel());
+    this.activeAnimations = [];
+    this.rollingTracks = [];
+    this.reverseRollingTracks = [];
   }
+
   Timereset(t) { this.resetTime(t); }
-  pause() { this.paused = true; }
-  resume() { this.paused = false; }
 
+  // 修复：暂停时同步暂停所有 WAAPI 动画，弹幕真正冻结
+  pause() {
+    this.paused = true;
+    this.activeAnimations.forEach(({ anim }) => {
+      if (anim.playState === "running") anim.pause();
+    });
+  }
 
+  // 修复：恢复时同步恢复所有 WAAPI 动画
+  resume() {
+    this.paused = false;
+    this.activeAnimations.forEach(({ anim }) => {
+      if (anim.playState === "paused") anim.play();
+    });
+  }
+
+  // 修复：addComment 后立即标记 _displayed = true，防止主循环重复渲染
+  // 同时统一弹幕池过滤，和 displayComments 逻辑保持一致
   addComment(cd) {
     this.comments.push(cd);
-    cd._displayed = false;
+    cd._displayed = true; // 关键修复：标记为已显示，防止主循环重复渲染
+    if (CommentManager.nopool.includes(cd.pool)) return;
+    if (this.filterChain && this.filterChain.filter([cd])) return;
     this.show(cd);
   }
 
-
   Dmlength() { return this.comments.length; }
   setsduration(v) { this.sduration = v; }
+  setvelocity(v) { this.velocity = v; }
 }
 CommentManager.nopool = [];
 
-
-// ===================== 主应用 =====================
 class PADPlayer {
   constructor() {
-    this.avId = '';
+    this.avId = "";
     this.mode = 0;
     this.localDanmaku = [];
     this.anyLoaded = false;
     this.xunhuan = false;
-    this.tot = '0:00';
-    this.rggurl = '';
+    this.tot = "0:00";
+    this.rggurl = "";
     this.config = null;
     this.cm = null;
     this.mf = new ModeFilter();
@@ -758,8 +803,7 @@ class PADPlayer {
     this.sfc = new FilterChain();
     this.mdcValue = 1;
     this._seeking = false;
-    this.currentVideoPath = '';
-
+    this.currentVideoPath = "";
 
     this.els = {};
     this.initElements();
@@ -767,163 +811,134 @@ class PADPlayer {
     this.loadConfig();
   }
 
-
   initElements() {
-    const ids = ['video','video-inner','danmaku-layer','pb','ps','tl','mucor','vs','cob','xunhuanb','fsbtn',
-      'msds','cpk','fsc','cti','csb','cdg','filterkwlist','addkwb','delkwb','kwinput',
-      '_mode1','_mode4','_mode5','_mode6','vspool0','vspool1','vspool2',
-      'titleq','btutcq','dm1','dm2','dm3','dm4','systemconfig','btutcx','vapl','part',
-      'cofgs','txtsktinfo','dmcont','ply'];
+    const ids = ["video","video-inner","danmaku-layer","pb","ps","tl","mucor","vs","cob","xunhuanb","fsbtn",
+      "msds","cpk","fsc","cti","csb","cdg","filterkwlist","addkwb","delkwb","kwinput",
+      "_mode1","_mode4","_mode5","_mode6","vspool0","vspool1","vspool2",
+      "titleq","btutcq","dm1","dm2","dm3","dm4","systemconfig","btutcx","vapl","part",
+      "cofgs","txtsktinfo","dmcont","ply"];
     ids.forEach(id => this.els[id] = document.getElementById(id));
-    this.els.cdgBody = this.els.cdg.querySelector('tbody');
+    this.els.cdgBody = this.els.cdg.querySelector("tbody");
   }
-
 
   bindEvents() {
     const v = this.els.video;
-    v.addEventListener('click', () => this.onPlay());
-    v.addEventListener('loadedmetadata', () => this.onMetaLoad());
-    v.addEventListener('progress', () => this.onProgress());
-    v.addEventListener('error', () => this.onVError());
-    v.addEventListener('ended', () => this.onEnded());
-    v.addEventListener('play', () => {
-      this.els.pb.textContent = '⏸';
-      this.els.ply.style.display = 'none';
+    v.addEventListener("click", () => this.onPlay());
+    v.addEventListener("loadedmetadata", () => this.onMetaLoad());
+    v.addEventListener("progress", () => this.onProgress());
+    v.addEventListener("error", () => this.onVError());
+    v.addEventListener("ended", () => this.onEnded());
+    v.addEventListener("play", () => {
+      this.els.pb.textContent = "⏸";
+      this.els.ply.style.display = "none";
       this.cm.resume();
     });
-    v.addEventListener('pause', () => {
-      this.els.pb.textContent = '▶';
-      this.els.ply.style.display = 'block';
+    v.addEventListener("pause", () => {
+      this.els.pb.textContent = "▶";
+      this.els.ply.style.display = "block";
       this.cm.pause();
     });
 
+    this.els.pb.addEventListener("click", () => this.onPlay());
+    this.els.ply.addEventListener("click", () => this.onPlay());
 
-    this.els.pb.addEventListener('click', () => this.onPlay());
-    this.els.ply.addEventListener('click', () => this.onPlay());
-
-
-    this.els.ps.addEventListener('input', (e) => {
+    this.els.ps.addEventListener("input", (e) => {
       const v = this.els.video;
       if (v.readyState < 1) return;
       if (this._seeking) {
         const val = parseFloat(e.target.value);
-        this.els.tl.textContent = this.formatTime(val) + '/' + this.tot;
+        this.els.tl.textContent = this.formatTime(val) + "/" + this.tot;
         return;
       }
       v.currentTime = parseFloat(e.target.value);
       this.cm.resetTime(v.currentTime);
-      this.els.ply.style.display = 'none';
-      this.els.pb.textContent = '⏸';
+      this.els.ply.style.display = "none";
+      this.els.pb.textContent = "⏸";
     });
-    this.els.ps.addEventListener('mousedown', () => { this._seeking = true; this.cm.pause(); this.els.video.pause(); this.els.pb.textContent = '▶'; });
-    this.els.ps.addEventListener('mouseup', () => {
+    this.els.ps.addEventListener("mousedown", () => { this._seeking = true; this.cm.pause(); this.els.video.pause(); this.els.pb.textContent = "▶"; });
+    this.els.ps.addEventListener("mouseup", () => {
       this._seeking = false;
       const v = this.els.video;
       v.currentTime = parseFloat(this.els.ps.value);
       this.cm.resetTime(v.currentTime);
       v.play().catch(() => {});
       this.cm.resume();
-      this.els.pb.textContent = '⏸';
-      this.els.ply.style.display = 'none';
+      this.els.pb.textContent = "⏸";
+      this.els.ply.style.display = "none";
     });
 
+    this.els.vs.addEventListener("input", (e) => this.soundAdjust(e));
+    this.els.mucor.addEventListener("click", () => this.muix());
 
-    this.els.vs.addEventListener('input', (e) => this.soundAdjust(e));
-    this.els.mucor.addEventListener('click', () => this.muix());
+    this.els.cob.addEventListener("click", () => this.ycpl());
+    this.els.xunhuanb.addEventListener("click", () => this.xunhuani());
+    this.els.fsbtn.addEventListener("click", () => this.onFS());
 
+    this.els.csb.addEventListener("click", () => this.onSend());
+    this.els.cti.addEventListener("keydown", (e) => this.btnOK_Enter(e));
+    this.els.msds.addEventListener("click", () => { this.els.titleq.style.display = "block"; });
 
-    this.els.cob.addEventListener('click', () => this.ycpl());
-    this.els.xunhuanb.addEventListener('click', () => this.xunhuani());
-    this.els.fsbtn.addEventListener('click', () => this.onFS());
+    this.els.btutcq.addEventListener("click", () => { this.els.titleq.style.display = "none"; });
+    this.els.btutcx.addEventListener("click", () => { this.els.systemconfig.style.display = "none"; });
+    this.els.cofgs.addEventListener("click", () => { this.els.systemconfig.style.display = "block"; });
 
+    this.els.dm1.addEventListener("click", () => { this.mdcValue = 5; this.els.titleq.style.display = "none"; });
+    this.els.dm2.addEventListener("click", () => { this.mdcValue = 1; this.els.titleq.style.display = "none"; });
+    this.els.dm3.addEventListener("click", () => { this.mdcValue = 6; this.els.titleq.style.display = "none"; });
+    this.els.dm4.addEventListener("click", () => { this.mdcValue = 4; this.els.titleq.style.display = "none"; });
 
-    this.els.csb.addEventListener('click', () => this.onSend());
-    this.els.cti.addEventListener('keydown', (e) => this.btnOK_Enter(e));
-    this.els.msds.addEventListener('click', () => { this.els.titleq.style.display = 'block'; });
-
-
-    this.els.btutcq.addEventListener('click', () => { this.els.titleq.style.display = 'none'; });
-    this.els.btutcx.addEventListener('click', () => { this.els.systemconfig.style.display = 'none'; });
-    this.els.cofgs.addEventListener('click', () => { this.els.systemconfig.style.display = 'block'; });
-
-
-    // 模式选择
-    this.els.dm1.addEventListener('click', () => { this.mdcValue = 5; this.els.titleq.style.display = 'none'; });
-    this.els.dm2.addEventListener('click', () => { this.mdcValue = 1; this.els.titleq.style.display = 'none'; });
-    this.els.dm3.addEventListener('click', () => { this.mdcValue = 6; this.els.titleq.style.display = 'none'; });
-    this.els.dm4.addEventListener('click', () => { this.mdcValue = 4; this.els.titleq.style.display = 'none'; });
-
-
-    // Tab 切换
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
       });
     });
 
-
-    // 过滤模式按钮
-    ['_mode1','_mode4','_mode5','_mode6'].forEach(id => {
+    ["_mode1","_mode4","_mode5","_mode6"].forEach(id => {
       const btn = this.els[id];
-      btn.addEventListener('click', () => {
-        btn.classList.toggle('active');
+      btn.addEventListener("click", () => {
+        btn.classList.toggle("active");
         this.onFMode();
       });
     });
 
-
-    // 弹幕池过滤
-    ['vspool0','vspool1','vspool2'].forEach(id => {
-      this.els[id].addEventListener('click', () => this.onpool());
+    ["vspool0","vspool1","vspool2"].forEach(id => {
+      this.els[id].addEventListener("click", () => this.onpool());
     });
 
+    this.els.addkwb.addEventListener("click", () => this.onAddKWB());
+    this.els.delkwb.addEventListener("click", () => this.onDelKWB());
+    this.els.kwinput.addEventListener("keydown", (e) => { if(e.key==="Enter") this.onAddKWB(); });
 
-    // 关键词过滤
-    this.els.addkwb.addEventListener('click', () => this.onAddKWB());
-    this.els.delkwb.addEventListener('click', () => this.onDelKWB());
-    this.els.kwinput.addEventListener('keydown', (e) => { if(e.key==='Enter') this.onAddKWB(); });
-
-
-    // 设置
-    this.els.vapl.addEventListener('input', (e) => { window.CommentCommapl = parseFloat(e.target.value); });
+    this.els.vapl.addEventListener("input", (e) => { window.CommentCommapl = parseFloat(e.target.value); });
     document.querySelectorAll('input[name="dmMB"]').forEach(r => {
-      r.addEventListener('change', () => { window.CommentCommaMB = parseInt(r.value); });
+      r.addEventListener("change", () => { window.CommentCommaMB = parseInt(r.value); });
     });
 
+    document.addEventListener("fullscreenchange", () => this.fullScreenHandler());
 
-    // 全屏监听
-    document.addEventListener('fullscreenchange', () => this.fullScreenHandler());
-
-
-    // 弹幕列表点击跳转
-    this.els.cdgBody.addEventListener('click', (e) => {
-      const tr = e.target.closest('tr');
+    this.els.cdgBody.addEventListener("click", (e) => {
+      const tr = e.target.closest("tr");
       if (!tr) return;
-      this.els.cdgBody.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
-      tr.classList.add('selected');
+      this.els.cdgBody.querySelectorAll("tr").forEach(r => r.classList.remove("selected"));
+      tr.classList.add("selected");
     });
-    this.els.cdgBody.addEventListener('dblclick', (e) => {
-      const tr = e.target.closest('tr');
+    this.els.cdgBody.addEventListener("dblclick", (e) => {
+      const tr = e.target.closest("tr");
       if (!tr || !tr._data) return;
       const t = Math.max(0, tr._data.time - 1);
       this.els.video.currentTime = t;
       this.cm.resetTime(t);
     });
 
-
-    // 视频比例
-    document.querySelectorAll('#spwh button').forEach(b => {
-      b.addEventListener('click', () => this.WHbh(b.dataset.wh));
+    document.querySelectorAll("#spwh button").forEach(b => {
+      b.addEventListener("click", () => this.WHbh(b.dataset.wh));
     });
 
-
-    // 循环渲染
     requestAnimationFrame(() => this.loop());
   }
-
 
   loop() {
     const v = this.els.video;
@@ -931,7 +946,7 @@ class PADPlayer {
       this.els.ps.max = v.duration;
       if (!this._seeking) this.els.ps.value = v.currentTime;
       this.tot = this.formatTime(v.duration);
-      this.els.tl.textContent = this.formatTime(v.currentTime) + '/' + this.tot;
+      this.els.tl.textContent = this.formatTime(v.currentTime) + "/" + this.tot;
       if (!v.paused) {
         this.cm.displayComments(v.currentTime);
       }
@@ -939,35 +954,34 @@ class PADPlayer {
     requestAnimationFrame(() => this.loop());
   }
 
-
   loadConfig() {
-    fetch('./pad.xml')
+    fetch("./pad.xml")
       .then(r => r.text())
       .then(xmlText => {
         const parser = new DOMParser();
-        const xml = parser.parseFromString(xmlText, 'text/xml');
+        const xml = parser.parseFromString(xmlText, "text/xml");
         const config = this.getDefaultConfig();
-        const scroll = xml.querySelector('scroll');
+        const scroll = xml.querySelector("scroll");
         if (scroll) {
-          config.constv = scroll.getAttribute('constv') !== 'false';
-          config.velocity = parseInt(scroll.getAttribute('delay')) || 4000;
+          config.constv = scroll.getAttribute("constv") !== "false";
+          config.velocity = parseInt(scroll.getAttribute("delay")) || 4000;
         }
-        const fade = xml.querySelector('fade');
+        const fade = xml.querySelector("fade");
         if (fade) {
-          config.sduration = parseInt(fade.getAttribute('delay')) || 3500;
-          config.alphaTo = parseFloat(fade.getAttribute('alphaTo')) || 1;
+          config.sduration = parseInt(fade.getAttribute("delay")) || 3500;
+          config.alphaTo = parseFloat(fade.getAttribute("alphaTo")) || 1;
         }
-        const pool = xml.querySelector('pool');
-        if (pool) config.poolsize = parseInt(pool.getAttribute('capacity')) || 80;
-        const rgg = xml.querySelector('rgg');
+        const pool = xml.querySelector("pool");
+        if (pool) config.poolsize = parseInt(pool.getAttribute("capacity")) || 80;
+        const rgg = xml.querySelector("rgg");
         if (rgg) {
-          config.rggimg = rgg.getAttribute('img') || '';
-          config.rggsrc = rgg.getAttribute('url') || '';
-          config.rggtitle = rgg.getAttribute('title') || 'no';
+          config.rggimg = rgg.getAttribute("img") || "";
+          config.rggsrc = rgg.getAttribute("url") || "";
+          config.rggtitle = rgg.getAttribute("title") || "no";
         }
-        const kw = xml.querySelector('keywords');
+        const kw = xml.querySelector("keywords");
         if (kw) {
-          const txt = kw.textContent || '';
+          const txt = kw.textContent || "";
           config.keywords = txt.split(/[,，]/).map(s => s.trim()).filter(Boolean);
         }
         this.onConfigLoaded(config);
@@ -975,15 +989,13 @@ class PADPlayer {
       .catch(() => this.onConfigLoaded(this.getDefaultConfig()));
   }
 
-
   getDefaultConfig() {
     return {
       constv: true, velocity: 4000, sduration: 3500, alphaTo: 1,
-      poolsize: 80, fduration: 4000, rggimg: '', rggsrc: '', rggtitle: 'no',
-      keywords: [], getPattern: '', sendPattern: ''
+      poolsize: 80, fduration: 4000, rggimg: "", rggsrc: "", rggtitle: "no",
+      keywords: [], getPattern: "", sendPattern: ""
     };
   }
-
 
   onConfigLoaded(config) {
     this.config = config;
@@ -991,13 +1003,11 @@ class PADPlayer {
     this.sfc = new FilterChain();
     this.sfc.addFilter(this.kf);
 
-
     const fc = new FilterChain();
     fc.addFilter(this.mf);
     fc.addFilter(this.kf);
 
-
-    this.cm = new CommentManager(this.els['danmaku-layer'], {
+    this.cm = new CommentManager(this.els["danmaku-layer"], {
       poolsize: config.poolsize,
       fduration: config.fduration,
       constv: config.constv,
@@ -1007,102 +1017,87 @@ class PADPlayer {
       filterChain: fc
     });
 
-
     config.keywords.forEach(k => this.addKWItem(k));
 
-
     const p = new URLSearchParams(location.search);
-    const file = p.get('file');
-    const id = p.get('id');
-    const vid = p.get('vid') || p.get('avid') || p.get('qid') || p.get('ykid') || p.get('uid');
-
+    const file = p.get("file");
+    const id = p.get("id");
+    const vid = p.get("vid") || p.get("avid") || p.get("qid") || p.get("ykid") || p.get("uid");
 
     if (file && id) {
       this.loadLocalVideo(file, id);
     } else if (vid) {
-      this.loadLocalVideo('av' + vid + '.mp4', vid);
+      this.loadLocalVideo("av" + vid + ".mp4", vid);
     } else {
-      this.loadLocalVideo('av1.mp4', '1');
+      this.loadLocalVideo("av1.mp4", "1");
     }
-
 
     this.initLocalUser();
   }
 
-
   initLocalUser() {
-    this.els.txtsktinfo.textContent = '本地弹幕模式 - 已就绪';
+    this.els.txtsktinfo.textContent = "本地弹幕模式 - 已就绪";
     this.els.cti.maxLength = 220;
-    this.els.dmcont.value = '弹幕 0 条';
+    this.els.dmcont.value = "弹幕 0 条";
   }
-
 
   loadLocalVideo(file, id) {
     this.avId = id;
-    this.mode = 'FILE';
-    const videoPath = './video/' + file;
+    this.mode = "FILE";
+    const videoPath = "./video/" + file;
     this.currentVideoPath = videoPath;
 
-
-    console.log('[PADPlayer] 加载视频:', videoPath);
-    this.els.txtsktinfo.textContent = '加载视频: ' + file;
-
+    console.log("[PADPlayer] 加载视频:", videoPath);
+    this.els.txtsktinfo.textContent = "加载视频: " + file;
 
     this.els.video.src = videoPath;
     this.els.video.load();
-
 
     this.loadLocalDanmaku(id);
     this.disableAll();
   }
 
-
   loadLocalDanmaku(id) {
-    const path = './danmaku/av' + id + '.xml';
-    console.log('[PADPlayer] 请求弹幕:', path);
-    this.els.txtsktinfo.textContent += ' | 弹幕: av' + id + '.xml';
-
+    const path = "./danmaku/av" + id + ".xml";
+    console.log("[PADPlayer] 请求弹幕:", path);
+    this.els.txtsktinfo.textContent += " | 弹幕: av" + id + ".xml";
 
     fetch(path)
       .then(r => {
         if (!r.ok) {
-          console.error('[PADPlayer] 弹幕 HTTP 错误:', r.status, path);
-          throw new Error('HTTP ' + r.status);
+          console.error("[PADPlayer] 弹幕 HTTP 错误:", r.status, path);
+          throw new Error("HTTP " + r.status);
         }
         return r.text();
       })
       .then(xmlText => {
-        console.log('[PADPlayer] 弹幕 XML 长度:', xmlText.length);
+        console.log("[PADPlayer] 弹幕 XML 长度:", xmlText.length);
         const list = this.parseLocalDanmaku(xmlText);
-        console.log('[PADPlayer] 解析到弹幕数:', list.length);
+        console.log("[PADPlayer] 解析到弹幕数:", list.length);
         this.onLocalDanmakuLoaded(list);
       })
       .catch(err => {
-        console.error('[PADPlayer] 弹幕加载失败:', err);
+        console.error("[PADPlayer] 弹幕加载失败:", err);
         this.onLocalDanmakuLoaded([]);
       });
   }
 
-
-  // ===================== 修复：解析 + 去重 =====================
   parseLocalDanmaku(xmlText) {
     const result = [];
-    const seen = new Set(); // 去重：防止 XML 里出现重复条目
+    const seen = new Set();
     try {
       const parser = new DOMParser();
-      const xml = parser.parseFromString(xmlText, 'text/xml');
-      const items = xml.querySelectorAll('d');
-      console.log('[PADPlayer] XML 中 <d> 标签数:', items.length);
-
+      const xml = parser.parseFromString(xmlText, "text/xml");
+      const items = xml.querySelectorAll("d");
+      console.log("[PADPlayer] XML 中 <d> 标签数:", items.length);
 
       items.forEach((item, idx) => {
-        const p = item.getAttribute('p') || '';
-        const parts = p.split(',');
+        const p = item.getAttribute("p") || "";
+        const parts = p.split(",");
         if (parts.length < 2) {
-          console.warn('[PADPlayer] 跳过格式不对的弹幕, idx=', idx, 'p=', p);
+          console.warn("[PADPlayer] 跳过格式不对的弹幕, idx=", idx, "p=", p);
           return;
         }
-
 
         const time  = parseFloat(parts[0]) || 0;
         const mode  = parseInt(parts[1]) || 1;
@@ -1113,113 +1108,103 @@ class PADPlayer {
           ? new Date(parseInt(parts[4]) * 1000).toLocaleString()
           : new Date().toLocaleString();
 
-
-        // 去重键：时间+模式+字号+颜色+内容
-        const key = `${time}|${mode}|${size}|${color}|${pool}|${item.textContent}`;
+        const key = time + "|" + mode + "|" + size + "|" + color + "|" + pool + "|" + item.textContent;
         if (seen.has(key)) return;
         seen.add(key);
 
-
-        result.push(new CommentData(mode, time, color, size, item.textContent || '', date, pool));
+        result.push(new CommentData(mode, time, color, size, item.textContent || "", date, pool));
       });
     } catch(e) {
-      console.error('[PADPlayer] 解析弹幕 XML 出错:', e);
+      console.error("[PADPlayer] 解析弹幕 XML 出错:", e);
     }
     return result;
   }
 
-
   onLocalDanmakuLoaded(list) {
     this.cm.init(list);
-    this.localDanmaku = [...list];  // 复制数组，避免和 cm.comments 共享引用
+    this.localDanmaku = [...list];
     this.updateDanmakuList();
-    this.els.dmcont.value = '弹幕 ' + list.length + ' 条';
+    this.els.dmcont.value = "弹幕 " + list.length + " 条";
     if (this.anyLoaded) {
       this.els.video.play().catch(()=>{});
       this.enableAll();
-      this.els.pb.textContent = '⏸';
+      this.els.pb.textContent = "⏸";
       this.anyLoaded = false;
     } else {
       this.anyLoaded = true;
-      // 修复：如果视频已经就绪但之前加载失败，也解锁控件
       if (this.els.video.readyState >= 1 || this.els.video.duration) {
         this.enableAll();
       }
     }
   }
 
-
   updateDanmakuList() {
     const tb = this.els.cdgBody;
-    tb.innerHTML = '';
+    tb.innerHTML = "";
     this.localDanmaku.forEach(d => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${this.formatTimes(d.time)}</td><td title="${this.escapeHtml(d.txt)}">${this.escapeHtml(d.txt)}</td><td>${d.date}</td>`;
+      const tr = document.createElement("tr");
+      tr.innerHTML = "<td>" + this.formatTimes(d.time) + "</td><td title="" + this.escapeHtml(d.txt) + "">" + this.escapeHtml(d.txt) + "</td><td>" + d.date + "</td>";
       tr._data = d;
       tb.appendChild(tr);
     });
   }
 
-
   escapeHtml(t) {
-    const d = document.createElement('div');
+    const d = document.createElement("div");
     d.textContent = t;
     return d.innerHTML;
   }
 
-
+  // 修复：使用最近发送队列（5条/5秒）替代仅对比最后一条，防止中间插入后重复发送
   sendLocalDanmaku(cd) {
-    // 去重兜底：最近 3 秒内相同内容不再添加
     const now = Date.now();
-    const last = this.localDanmaku[this.localDanmaku.length - 1];
-    if (last && last.txt === cd.txt && last.mode === cd.mode && last.color === cd.color && (now - (last._ts || 0)) < 3000) {
-      return;
-    }
-    cd._ts = now;
+    this.cm._recentSent = this.cm._recentSent || [];
+    this.cm._recentSent = this.cm._recentSent.filter(s => now - s.ts < 5000);
+
+    const dup = this.cm._recentSent.some(s =>
+      s.txt === cd.txt && s.mode === cd.mode && s.color === cd.color
+    );
+    if (dup) return;
+
+    this.cm._recentSent.push({ txt: cd.txt, mode: cd.mode, color: cd.color, ts: now });
+
     this.localDanmaku.push(cd);
     this.cm.addComment(cd);
-    this.els.dmcont.value = '弹幕 ' + this.cm.Dmlength() + ' 条';
+    this.els.dmcont.value = "弹幕 " + this.cm.Dmlength() + " 条";
     this.updateDanmakuList();
     const tb = this.els.cdgBody;
     tb.scrollTop = tb.scrollHeight;
   }
 
-
   onMetaLoad() {
     const v = this.els.video;
     this.tot = this.formatTime(v.duration || 0);
     this.els.ps.max = v.duration || 100;
-    this.els.tl.textContent = '0:00/' + this.tot;
+    this.els.tl.textContent = "0:00/" + this.tot;
     if (this.anyLoaded) {
       v.play().catch(()=>{});
       this.enableAll();
       this.anyLoaded = false;
     } else {
       this.anyLoaded = true;
-      // 视频就绪但弹幕还没加载完，先同步一次按钮状态
       if (v.paused) {
-        this.els.pb.textContent = '▶';
-        this.els.ply.style.display = 'block';
+        this.els.pb.textContent = "▶";
+        this.els.ply.style.display = "block";
       }
     }
   }
 
-
   onVError() {
     const v = this.els.video;
     const err = v.error;
-    let errCode = err ? err.code : 'unknown';
-    console.log('[PADPlayer] video error, code=' + errCode + ', path=' + this.currentVideoPath);
-    this.els.txtsktinfo.textContent = '视频载入错误 (code:' + errCode + ')，请检查文件';
-    // 修复：视频加载失败时也标记 anyLoaded，让弹幕加载完成后能解锁控件
+    let errCode = err ? err.code : "unknown";
+    console.log("[PADPlayer] video error, code=" + errCode + ", path=" + this.currentVideoPath);
+    this.els.txtsktinfo.textContent = "视频载入错误 (code:" + errCode + ")，请检查文件";
     if (!this.anyLoaded) this.anyLoaded = true;
   }
 
-
   onProgress() {
-    // 缓冲进度
   }
-
 
   onEnded() {
     if (this.xunhuan) {
@@ -1231,7 +1216,6 @@ class PADPlayer {
     }
   }
 
-
   enableAll() {
     this.els.pb.disabled = false;
     this.els.cob.disabled = false;
@@ -1239,19 +1223,17 @@ class PADPlayer {
     this.els.ps.disabled = false;
     this.els.csb.disabled = false;
     this.els.cti.disabled = false;
-    // 根据视频实际状态同步播放按钮
     if (this.els.video.paused) {
-      this.els.pb.textContent = '▶';
-      this.els.ply.style.display = 'block';
+      this.els.pb.textContent = "▶";
+      this.els.ply.style.display = "block";
     } else {
-      this.els.pb.textContent = '⏸';
-      this.els.ply.style.display = 'none';
+      this.els.pb.textContent = "⏸";
+      this.els.ply.style.display = "none";
     }
     this.els.video.volume = parseFloat(this.els.vs.value);
-    const fileName = this.currentVideoPath ? this.currentVideoPath.split('/').pop() : '';
-    this.els.txtsktinfo.textContent = '本地弹幕模式 - 播放中: ' + fileName;
+    const fileName = this.currentVideoPath ? this.currentVideoPath.split("/").pop() : "";
+    this.els.txtsktinfo.textContent = "本地弹幕模式 - 播放中: " + fileName;
   }
-
 
   disableAll() {
     this.els.pb.disabled = true;
@@ -1262,7 +1244,6 @@ class PADPlayer {
     this.els.cti.disabled = true;
   }
 
-
   onPlay() {
     const v = this.els.video;
     if (v.paused || v.ended) {
@@ -1272,63 +1253,57 @@ class PADPlayer {
     }
   }
 
-
   onPlaying(e) {
     const v = this.els.video;
     if (v.readyState < 1) return;
     if (this._seeking) {
       const val = parseFloat(e.target.value);
-      this.els.tl.textContent = this.formatTime(val) + '/' + this.tot;
+      this.els.tl.textContent = this.formatTime(val) + "/" + this.tot;
       return;
     }
     v.currentTime = parseFloat(e.target.value);
     this.cm.resetTime(v.currentTime);
-    this.els.ply.style.display = 'none';
-    this.els.pb.textContent = '⏸';
+    this.els.ply.style.display = "none";
+    this.els.pb.textContent = "⏸";
   }
 
-
   formatTime(s) {
-    if (!isFinite(s)) return '0:00';
+    if (!isFinite(s)) return "0:00";
     const m = Math.floor(s / 60);
     const sec = Math.floor(s % 60);
-    return m + ':' + (sec < 10 ? '0' : '') + sec;
+    return m + ":" + (sec < 10 ? "0" : "") + sec;
   }
   formatTimes(s) {
     const m = Math.floor(s / 60);
     const sec = Math.floor(s % 60);
-    return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+    return (m < 10 ? "0" : "") + m + ":" + (sec < 10 ? "0" : "") + sec;
   }
-
 
   muix() {
     const v = this.els.video;
     if (v.volume !== 0) {
       v.volume = 0;
-      this.els.mucor.textContent = '🔇';
+      this.els.mucor.textContent = "🔇";
     } else {
       v.volume = parseFloat(this.els.vs.value);
-      this.els.mucor.textContent = '🔊';
+      this.els.mucor.textContent = "🔊";
     }
   }
-
 
   soundAdjust(e) {
     const val = parseFloat(e.target.value);
     if (val === 0) { this.muix(); return; }
-    this.els.mucor.textContent = '🔊';
+    this.els.mucor.textContent = "🔊";
     this.els.video.volume = val;
   }
 
-
   onFMode() {
     this.mf.removeALL();
-    if (!this.els._mode1.classList.contains('active')) this.mf.addMode(1);
-    if (!this.els._mode4.classList.contains('active')) this.mf.addMode(4);
-    if (!this.els._mode5.classList.contains('active')) this.mf.addMode(5);
-    if (!this.els._mode6.classList.contains('active')) this.mf.addMode(6);
+    if (!this.els._mode1.classList.contains("active")) this.mf.addMode(1);
+    if (!this.els._mode4.classList.contains("active")) this.mf.addMode(4);
+    if (!this.els._mode5.classList.contains("active")) this.mf.addMode(5);
+    if (!this.els._mode6.classList.contains("active")) this.mf.addMode(6);
   }
-
 
   onpool() {
     CommentManager.nopool = [];
@@ -1337,7 +1312,6 @@ class PADPlayer {
     if (!this.els.vspool2.checked) CommentManager.nopool.push(2);
   }
 
-
   onAddKWB() {
     const v = this.els.kwinput.value.trim();
     if (!v) return;
@@ -1345,95 +1319,84 @@ class PADPlayer {
     if (items.includes(v)) return;
     this.addKWItem(v);
     this.kf.keywords.push(v);
-    this.els.kwinput.value = '';
+    this.els.kwinput.value = "";
   }
 
-
   addKWItem(v) {
-    const div = document.createElement('div');
+    const div = document.createElement("div");
     div.textContent = v;
     this.els.filterkwlist.appendChild(div);
-    div.addEventListener('click', () => {
-      Array.from(this.els.filterkwlist.children).forEach(c => c.classList.remove('selected'));
-      div.classList.add('selected');
+    div.addEventListener("click", () => {
+      Array.from(this.els.filterkwlist.children).forEach(c => c.classList.remove("selected"));
+      div.classList.add("selected");
     });
   }
 
-
   onDelKWB() {
-    const sel = this.els.filterkwlist.querySelector('.selected');
+    const sel = this.els.filterkwlist.querySelector(".selected");
     if (!sel) return;
     const idx = Array.from(this.els.filterkwlist.children).indexOf(sel);
     this.kf.keywords.splice(idx, 1);
     sel.remove();
   }
 
-
   xunhuani() {
     this.xunhuan = !this.xunhuan;
-    this.els.xunhuanb.title = this.xunhuan ? '洗脑循环 on!' : '洗脑循环 off';
-    this.els.xunhuanb.style.color = this.xunhuan ? '#f00' : '';
+    this.els.xunhuanb.title = this.xunhuan ? "洗脑循环 on!" : "洗脑循环 off";
+    this.els.xunhuanb.style.color = this.xunhuan ? "#f00" : "";
   }
 
-
   ycpl() {
-    const layer = this.els['danmaku-layer'];
-    if (layer.style.display === 'none') {
-      layer.style.display = 'block';
-      this.els.cob.textContent = '💬';
-      this.els.cob.title = '隐藏评论';
+    const layer = this.els["danmaku-layer"];
+    if (layer.style.display === "none") {
+      layer.style.display = "block";
+      this.els.cob.textContent = "💬";
+      this.els.cob.title = "隐藏评论";
     } else {
-      layer.style.display = 'none';
-      this.els.cob.textContent = '🚫';
-      this.els.cob.title = '显示评论';
+      layer.style.display = "none";
+      this.els.cob.textContent = "🚫";
+      this.els.cob.title = "显示评论";
     }
   }
 
-
-  // ===================== 修复：删除重复的 cm.addComment =====================
   onSend() {
     const v = this.els.video;
     if (v.readyState < 1) return;
     if (this.els.csb.disabled) return;
     const txt = this.els.cti.value;
-    if (!txt || txt.trim() === '') return;
+    if (!txt || txt.trim() === "") return;
 
-
-    // 防抖锁：防止重复发送
     if (this._sendBusy) return;
     this._sendBusy = true;
     setTimeout(() => { this._sendBusy = false; }, 800);
 
-
-    // 彩蛋
-    if (txt.indexOf('瞎了我的狗眼') > -1 || txt === 'my eyes!!!') {
-      v.style.filter = 'blur(20px)';
-    } else if (txt.indexOf('我有霸气爷们眼') > -1 || txt.indexOf('双眼一亮') > -1 || txt.indexOf('我做好瞎狗眼的觉悟了') > -1 || txt.indexOf('变态有什么错的') > -1 || txt.indexOf('狗眼是拿来抛弃的东西') > -1) {
-      v.style.filter = '';
+    if (txt.indexOf("瞎了我的狗眼") > -1 || txt === "my eyes!!!") {
+      v.style.filter = "blur(20px)";
+    } else if (txt.indexOf("我有霸气爷们眼") > -1 || txt.indexOf("双眼一亮") > -1 || txt.indexOf("我做好瞎狗眼的觉悟了") > -1 || txt.indexOf("变态有什么错的") > -1 || txt.indexOf("狗眼是拿来抛弃的东西") > -1) {
+      v.style.filter = "";
     }
-    if (txt.indexOf('撸多了会双眼模糊') > -1) {
-      document.getElementById('app').style.filter = 'blur(4px)';
+    if (txt.indexOf("撸多了会双眼模糊") > -1) {
+      document.getElementById("app").style.filter = "blur(4px)";
     }
-    if (txt.indexOf('不要平滑') > -1) {
-      v.style.imageRendering = 'pixelated';
-    } else if (txt.indexOf('给爷平滑') > -1) {
-      v.style.imageRendering = 'auto';
+    if (txt.indexOf("不要平滑") > -1) {
+      v.style.imageRendering = "pixelated";
+    } else if (txt.indexOf("给爷平滑") > -1) {
+      v.style.imageRendering = "auto";
     }
-    if (txt.indexOf('要看黑白电视') > -1) {
-      v.style.filter = 'grayscale(100%)';
-    } else if (txt.indexOf('还是看彩色电视吧') > -1) {
-      v.style.filter = '';
+    if (txt.indexOf("要看黑白电视") > -1) {
+      v.style.filter = "grayscale(100%)";
+    } else if (txt.indexOf("还是看彩色电视吧") > -1) {
+      v.style.filter = "";
     }
-    if (txt.indexOf('给爷全屏') > -1) {
+    if (txt.indexOf("给爷全屏") > -1) {
       this.onFS();
     }
-
 
     const pool = parseInt(document.querySelector('input[name="pool"]:checked').value);
     const cd = new CommentData(
       this.mdcValue,
       v.currentTime,
-      parseInt(this.els.cpk.value.replace('#',''), 16),
+      parseInt(this.els.cpk.value.replace("#",""), 16),
       parseInt(this.els.fsc.value),
       txt,
       new Date().toLocaleString(),
@@ -1441,30 +1404,25 @@ class PADPlayer {
       true
     );
 
-
     if (this.sfc.filter([cd])) return;
 
-
-    // 只通过 sendLocalDanmaku 统一添加，避免重复
     this.sendLocalDanmaku(cd);
-    this.els.cti.value = '';
+    this.els.cti.value = "";
   }
-
 
   btnOK_Enter(e) {
     if (e.isComposing) return;
-    if (e.ctrlKey && e.key === 'Enter') {
-      this.els.cti.value += '\r';
-    } else if (e.key === 'Enter') {
+    if (e.ctrlKey && e.key === "Enter") {
+      this.els.cti.value += "\r";
+    } else if (e.key === "Enter") {
       e.preventDefault();
       e.stopPropagation();
       this.onSend();
     }
   }
 
-
   onFS() {
-    const app = document.getElementById('app');
+    const app = document.getElementById("app");
     if (!document.fullscreenElement) {
       app.requestFullscreen().catch(()=>{});
     } else {
@@ -1472,82 +1430,74 @@ class PADPlayer {
     }
   }
 
-
+  // 修复：全屏时按宽度比例同步调整滚动速度 velocity，避免速度突兀变快
   fullScreenHandler() {
-    const app = document.getElementById('app');
+    const app = document.getElementById("app");
     const isFS = !!document.fullscreenElement;
     if (isFS) {
-      app.classList.add('fullscreen');
-      this.cm.setsduration(window.innerWidth / 537 * 3000);
+      app.classList.add("fullscreen");
+      const ratio = window.innerWidth / 542;
+      this.cm.setsduration(3500 * ratio);
+      this.cm.setvelocity(Math.round(4000 * ratio));
     } else {
-      app.classList.remove('fullscreen');
+      app.classList.remove("fullscreen");
       this.cm.setsduration(3500);
+      this.cm.setvelocity(4000);
     }
   }
 
-
+  // 修复：只清除和尺寸相关的样式，保留滤镜、imageRendering 等彩蛋效果
   WHbh(type) {
-    const inner = this.els['video-inner'];
+    const inner = this.els["video-inner"];
     const v = this.els.video;
-    const box = document.getElementById('video-box');
+    const box = document.getElementById("video-box");
 
+    v.style.width = "";
+    v.style.height = "";
+    v.style.maxWidth = "";
+    v.style.maxHeight = "";
+    v.style.objectFit = "";
 
-    // 先清空所有相关内联样式，避免切换残留
-    inner.style.cssText = '';
-    v.style.cssText = '';
+    inner.style.cssText = "";
+    inner.style.display = "flex";
+    inner.style.alignItems = "center";
+    inner.style.justifyContent = "center";
 
-
-    // 恢复基础 flex 居中布局
-    inner.style.display = 'flex';
-    inner.style.alignItems = 'center';
-    inner.style.justifyContent = 'center';
-
-
-    if (type === 'default') {
-      inner.style.width = '100%';
-      inner.style.height = '100%';
-      inner.style.position = 'relative';
-      v.style.maxWidth = '100%';
-      v.style.maxHeight = '100%';
-      v.style.objectFit = 'contain';
+    if (type === "default") {
+      inner.style.width = "100%";
+      inner.style.height = "100%";
+      inner.style.position = "relative";
+      v.style.maxWidth = "100%";
+      v.style.maxHeight = "100%";
+      v.style.objectFit = "contain";
       return;
     }
 
-
     const boxW = box.clientWidth;
     const boxH = box.clientHeight;
-    // 4:3 = 0.75,  16:9 ≈ 0.5625  (高/宽)
-    const ratio = type === '43' ? 3 / 4 : 9 / 16;
-
+    const ratio = type === "43" ? 3 / 4 : 9 / 16;
 
     let w = boxW;
     let h = w * ratio;
 
-
-    // 如果按宽度算出高度超出容器，则以容器高度为基准反推宽度
     if (h > boxH) {
       h = boxH;
       w = h / ratio;
     }
 
+    inner.style.width = Math.floor(w) + "px";
+    inner.style.height = Math.floor(h) + "px";
+    inner.style.position = "absolute";
+    inner.style.left = "50%";
+    inner.style.top = "50%";
+    inner.style.transform = "translate(-50%, -50%)";
 
-    // 绝对定位居中，确保不会超出 overflow:hidden 的父容器
-    inner.style.width = Math.floor(w) + 'px';
-    inner.style.height = Math.floor(h) + 'px';
-    inner.style.position = 'absolute';
-    inner.style.left = '50%';
-    inner.style.top = '50%';
-    inner.style.transform = 'translate(-50%, -50%)';
-
-
-    v.style.width = '100%';
-    v.style.height = '100%';
-    v.style.objectFit = 'contain';
+    v.style.width = "100%";
+    v.style.height = "100%";
+    v.style.objectFit = "contain";
   }
 }
 
-
-// 启动
 window.player = new PADPlayer();
 </script>
 </body>
