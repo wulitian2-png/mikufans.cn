@@ -436,7 +436,7 @@ video {
       <option value="45">很大</option>
     </select>
     <input type="text" id="cti" placeholder="回车发送" title="回车发送." maxlength="220">
-    <button id="csb" disabled title="毁灭的喷射白光!da!">发送评论</button>
+    <button id="csb" type="button" disabled title="毁灭的喷射白光!da!">发送评论</button>
   </div>
 
   <div id="right-panel">
@@ -747,6 +747,16 @@ class PADPlayer {
     v.addEventListener('progress', () => this.onProgress());
     v.addEventListener('error', () => this.onVError());
     v.addEventListener('ended', () => this.onEnded());
+    v.addEventListener('play', () => {
+      this.els.pb.textContent = '⏸';
+      this.els.ply.style.display = 'none';
+      this.cm.resume();
+    });
+    v.addEventListener('pause', () => {
+      this.els.pb.textContent = '▶';
+      this.els.ply.style.display = 'block';
+      this.cm.pause();
+    });
 
     this.els.pb.addEventListener('click', () => this.onPlay());
     this.els.ply.addEventListener('click', () => this.onPlay());
@@ -1078,11 +1088,13 @@ class PADPlayer {
   }
 
   sendLocalDanmaku(cd) {
-    // 去重兜底：如果最后一条和这条完全一样，不再添加
+    // 去重兜底：最近 2 秒内相同内容不再添加
+    const now = Date.now();
     const last = this.localDanmaku[this.localDanmaku.length - 1];
-    if (last && last.time === cd.time && last.txt === cd.txt && last.color === cd.color && last.mode === cd.mode) {
+    if (last && last.txt === cd.txt && last.mode === cd.mode && last.color === cd.color && (now - (last._ts || 0)) < 2000) {
       return;
     }
+    cd._ts = now;
     this.localDanmaku.push(cd);
     this.cm.addComment(cd);
     this.els.dmcont.value = '弹幕 ' + this.cm.Dmlength() + ' 条';
@@ -1099,7 +1111,6 @@ class PADPlayer {
     if (this.anyLoaded) {
       v.play().catch(()=>{});
       this.enableAll();
-      this.els.pb.textContent = '⏸';
       this.anyLoaded = false;
     } else {
       this.anyLoaded = true;
@@ -1124,12 +1135,8 @@ class PADPlayer {
     if (this.xunhuan) {
       this.els.video.currentTime = 0;
       this.cm.resetTime(0);
-      this.cm.resume();
       this.els.video.play().catch(()=>{});
-      this.els.pb.textContent = '⏸';
     } else {
-      this.els.pb.textContent = '▶';
-      this.els.ply.style.display = 'block';
       this.cm.pause();
     }
   }
@@ -1160,14 +1167,8 @@ class PADPlayer {
     const v = this.els.video;
     if (v.paused || v.ended) {
       v.play().catch(()=>{});
-      this.cm.resume();
-      this.els.pb.textContent = '⏸';
-      this.els.ply.style.display = 'none';
     } else {
       v.pause();
-      this.cm.pause();
-      this.els.pb.textContent = '▶';
-      this.els.ply.style.display = 'block';
     }
   }
 
@@ -1285,10 +1286,10 @@ class PADPlayer {
     const txt = this.els.cti.value;
     if (!txt || txt.trim() === '') return;
 
-    // 防抖锁：300ms 内禁止重复发送
-    const now = Date.now();
-    if (this._sendLock && now - this._sendLock < 300) return;
-    this._sendLock = now;
+    // 防抖锁：防止重复发送
+    if (this._sendBusy) return;
+    this._sendBusy = true;
+    setTimeout(() => { this._sendBusy = false; }, 800);
 
     // 彩蛋
     if (txt.indexOf('瞎了我的狗眼') > -1 || txt === 'my eyes!!!') {
@@ -1333,10 +1334,12 @@ class PADPlayer {
   }
 
   btnOK_Enter(e) {
+    if (e.isComposing) return;
     if (e.ctrlKey && e.key === 'Enter') {
       this.els.cti.value += '\r';
     } else if (e.key === 'Enter') {
       e.preventDefault();
+      e.stopPropagation();
       this.onSend();
     }
   }
