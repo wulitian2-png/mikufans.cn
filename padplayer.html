@@ -396,6 +396,7 @@ video {
 </style>
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 <div id="app">
@@ -1077,6 +1078,11 @@ class PADPlayer {
   }
 
   sendLocalDanmaku(cd) {
+    // 去重兜底：如果最后一条和这条完全一样，不再添加
+    const last = this.localDanmaku[this.localDanmaku.length - 1];
+    if (last && last.time === cd.time && last.txt === cd.txt && last.color === cd.color && last.mode === cd.mode) {
+      return;
+    }
     this.localDanmaku.push(cd);
     this.cm.addComment(cd);
     this.els.dmcont.value = '弹幕 ' + this.cm.Dmlength() + ' 条';
@@ -1279,6 +1285,11 @@ class PADPlayer {
     const txt = this.els.cti.value;
     if (!txt || txt.trim() === '') return;
 
+    // 防抖锁：300ms 内禁止重复发送
+    const now = Date.now();
+    if (this._sendLock && now - this._sendLock < 300) return;
+    this._sendLock = now;
+
     // 彩蛋
     if (txt.indexOf('瞎了我的狗眼') > -1 || txt === 'my eyes!!!') {
       v.style.filter = 'blur(20px)';
@@ -1354,30 +1365,52 @@ class PADPlayer {
   WHbh(type) {
     const inner = this.els['video-inner'];
     const v = this.els.video;
+    const box = document.getElementById('video-box');
+
+    // 先清空所有相关内联样式，避免切换残留
+    inner.style.cssText = '';
+    v.style.cssText = '';
+
+    // 恢复基础 flex 居中布局
+    inner.style.display = 'flex';
+    inner.style.alignItems = 'center';
+    inner.style.justifyContent = 'center';
+
     if (type === 'default') {
       inner.style.width = '100%';
       inner.style.height = '100%';
-      inner.style.paddingBottom = '0';
-      v.style.position = 'relative';
-      v.style.width = '';
-      v.style.height = '';
-    } else if (type === '43') {
-      inner.style.width = '100%';
-      inner.style.height = '0';
-      inner.style.paddingBottom = '75%';
       inner.style.position = 'relative';
-      v.style.position = 'absolute';
-      v.style.width = '100%';
-      v.style.height = '100%';
-    } else if (type === '169') {
-      inner.style.width = '100%';
-      inner.style.height = '0';
-      inner.style.paddingBottom = '56.25%';
-      inner.style.position = 'relative';
-      v.style.position = 'absolute';
-      v.style.width = '100%';
-      v.style.height = '100%';
+      v.style.maxWidth = '100%';
+      v.style.maxHeight = '100%';
+      v.style.objectFit = 'contain';
+      return;
     }
+
+    const boxW = box.clientWidth;
+    const boxH = box.clientHeight;
+    // 4:3 = 0.75,  16:9 ≈ 0.5625  (高/宽)
+    const ratio = type === '43' ? 3 / 4 : 9 / 16;
+
+    let w = boxW;
+    let h = w * ratio;
+
+    // 如果按宽度算出高度超出容器，则以容器高度为基准反推宽度
+    if (h > boxH) {
+      h = boxH;
+      w = h / ratio;
+    }
+
+    // 绝对定位居中，确保不会超出 overflow:hidden 的父容器
+    inner.style.width = Math.floor(w) + 'px';
+    inner.style.height = Math.floor(h) + 'px';
+    inner.style.position = 'absolute';
+    inner.style.left = '50%';
+    inner.style.top = '50%';
+    inner.style.transform = 'translate(-50%, -50%)';
+
+    v.style.width = '100%';
+    v.style.height = '100%';
+    v.style.objectFit = 'contain';
   }
 }
 
