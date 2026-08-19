@@ -104,13 +104,6 @@
 				alert("评论内容不能为空！");
 				return;
 			}
-			var feedbacktype = 'feedback';
-			var radios = form.feedbacktype;
-			if (radios) {
-				for (var i = 0; i < radios.length; i++) {
-					if (radios[i].checked) { feedbacktype = radios[i].value; break; }
-				}
-			}
 			var username = form.username ? form.username.value.trim() : '';
 			if (!username) username = '游客';
 
@@ -125,8 +118,7 @@
 				id: Date.now(),
 				username: username,
 				date: dateStr,
-				content: msg,
-				feedbacktype: feedbacktype
+				content: msg
 			};
 			localComments.unshift(cmt);
 			localStorage.setItem(localCmtKey, JSON.stringify(localComments));
@@ -265,7 +257,7 @@
 				 <!-- /place -->
 			<div class="viewbox">
 				<div class="content">
-				　　<embed pluginspage="http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash" src="http://mikufans.cn/PAD1.swf?vid=21881811" type="application/x-shockwave-flash" allowfullscreen="true" quality="high" height="500" width="950"></embed>
+				　　<iframe src="../../../../padplayer.html?id=1&file=av1.mp4" allowfullscreen="true" quality="high" height="500" width="950"></iframe>
 				</div><!-- /content -->
 			            	<div class="intro">221大人满塞!</div>
 				<div class="newdigg" id="newdigg">
@@ -290,23 +282,12 @@
 				<div class="boxoff">
 					<strong>------分隔线----------------------------</strong>
 				</div>
-				<div class="handle">
-					<div class="actbox">
-						<ul>
-							<li id="act-fav"><a href="/plus/stow.php?aid=1" target="_blank">收藏</a></li>
-							<li id="act-err"><a href="/plus/erraddsave.php?aid=1&title=绿坝绿坝★河蟹你全家!" target="_blank">挑错</a></li>
-							<li id="act-pus"><a href="/plus/recommend.php?aid=1" target="_blank">推荐</a></li>
-							<li id="act-pnt"><a href="#" onClick="window.print();">打印</a></li>
-						</ul>
-					</div><!-- /actbox -->
-				</div><!-- /handle -->
 			</div><!-- /viewbox -->
 
 			<div class="mt1">
 				<dl class="tbox">
 					<dt>
 						<strong>最新评论</strong>
-						<span class="more"><a href="/plus/feedback.php?aid=1">查看所有评论</a></span>
 					</dt>
 					<dd>
 						<div class="dede_comment" id="dede_comment">
@@ -318,23 +299,6 @@
 								<div class="decmt-content">
 									绿坝绿坝★河蟹你全家！
 								</div><!-- /decmt-content -->
-							</div><!-- /decmt-box -->
-							<div class="decmt-box">
-								<div class="decmt-title">
-									<span class="username"> 绿坝娘</span>
-									<span class="date"> 于 06-24 16:00</span>说到
-								</div><!-- /decmt-title -->
-								<div class="decmt-content">
-									这个视频太魔性了
-								</div><!-- /decmt-content -->
-							</div><!-- /decmt-box -->
-							<div class="decmt-box">
-								<div class="decmt-title">
-									<span class="username"> 河蟹</span>
-									<span class="date"> 于 06-24 18:20</span>说到
-								</div><!-- /decmt-title -->
-								<div class="decmt-content">
-									我报警了
 								</div><!-- /decmt-content -->
 							</div><!-- /decmt-box -->
 						</div><!-- /dede_comment -->
@@ -345,7 +309,6 @@
 				<dl class="tbox">
 					<dt>
 						<strong>发表评论</strong>
-						<span class="more"><a href="/plus/feedback.php?aid=1">查看所有评论</a></span>
 					</dt>
 					<dd>
 						<div class="dede_comment_post">
@@ -357,12 +320,6 @@
 								<div class="dcmp-title">
 									<small>请自觉遵守互联网相关的政策法规，严禁发布色情、暴力、反动的言论。</small>
 								</div><!-- /dcmp-title -->
-								<div class="dcmp-stand">
-									<strong>评价:</strong>
-									<input type="radio" name="feedbacktype" checked="1" value="feedback" id="dcmp-stand-neu" /><label for="dcmp-stand-neu">中立</label>
-									<input type="radio" name="feedbacktype" value="good" id="dcmp-stand-good" /><label for="dcmp-stand-good">好评</label>
-									<input type="radio" name="feedbacktype" value="bad" id="dcmp-stand-bad" /><label for="dcmp-stand-bad">差评</label>
-								</div><!-- /dcmp-stand -->
 								<div class="dcmp-content">
 									<textarea cols="60" name="msg" rows="5" class="ipt-txt"></textarea>
 								</div><!-- /dcmp-content -->
