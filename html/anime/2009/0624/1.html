@@ -9,12 +9,6 @@
 <script language="javascript" type="text/javascript" src="../../../../include/dedeajax2.js"></script>
 <script language="javascript" type="text/javascript">
 <!--
-	function CheckLogin(){
-	  var taget_obj = document.getElementById('_ajax_feedback');
-	  myajax = new DedeAjax(taget_obj,false,false,'','','');
-	  myajax.SendGet2("/member/ajax_feedback.php");
-	  DedeXHTTP = null;
-	}
 	function checkSubmit(){
 		if(document.feedback.msg.value.trim()!=''){
 			postLocalComment();
@@ -22,8 +16,6 @@
 			alert("评论内容不能为空！");
 		}
 	}
-
-	// ====== 本地文章顶踩功能（支持切换） ======
 	(function(){
 		var diggKey = 'mikufans_digg_1';
 		var diggData = localStorage.getItem(diggKey);
@@ -177,17 +169,17 @@
 <div class="header">
     <div class="top w960 center">
       <div class="title">
-        <h1> <a href="http://mikufans.cn/">Mikufans</a> </h1>
+        <h1> <a href="../../../../index.html">Mikufans</a> </h1>
       </div>
       <!-- /title -->
       <div class="banner"></div>
       <!-- /banner -->
       <div class="rlink">
         <ul>
-          <li class="r1"><a href="/member">会员中心</a></li>
-          <li class="r2"><a href="/tags.php">TAG标签</a></li>
-          <li class="r3"><a href="/data/sitemap.html">网站地图</a></li>
-          <li class="r4"><a href="/data/rssmap.html">RSS订阅</a></li>
+          <li class="r1"><a href="#">会员中心</a></li>
+          <li class="r2"><a href="../../../../tags.html">TAG标签</a></li>
+          <li class="r3"><a href="../../../../data/sitemap.html">网站地图</a></li>
+          <li class="r4"><a href="../../../../data/rssmap.html">RSS订阅</a></li>
         </ul>
       </div>
       <!-- /banner -->
@@ -197,11 +189,11 @@
       <div class="w960 center">
         <ul>
           <li><a href='/'>主页</a></li>
-          <li class='thisclass'><a href='/html/anime/index.html'>动画</a> </li>
-          <li><a href='/html/music/index.html'>音乐</a></li>
-          <li><a href='/html/game/index.html'>游戏</a></li>
-          <li><a href='/html/ent/index.html'>娱乐</a></li>
-          <li><a href='/html/neta/index.html'>文章</a></li>
+          <li class='thisclass'><a href='../../../../html/anime/index.html'>动画</a> </li>
+          <li><a href='../../../../html/music/index.html'>音乐</a></li>
+          <li><a href='../../../../html/game/index.html'>游戏</a></li>
+          <li><a href='../../../../html/ent/index.html'>娱乐</a></li>
+          <li><a href='../../../../html/neta/index.html'>文章</a></li>
 		  <li><a href='http://acgsola.com/' target="_blank">论坛</a></li>
         </ul>
       </div>
@@ -252,7 +244,7 @@
 <div class="w960 center clear mt1">
 	<div class="pleft" style="width:100%; float:left; overflow:hidden;">
 					<h2>绿坝绿坝★河蟹你全家!</h2>
-			<a href='http://mikufans.cn/'>主页</a> > <a href='/html/anime/index.html'>动画</a> >
+			<a href='../../../../index.html'>主页</a> > <a href='../../../../html/anime/index.html'>动画</a> >
 						<font size="3pt;">2009-06-24 14:47  bishi 投稿  <small>点击:</small><script src="/plus/count.php?view=yes&aid=1&mid=1" type='text/javascript' language="javascript"></script></font><!-- /info -->
 				 <!-- /place -->
 			<div class="viewbox">
